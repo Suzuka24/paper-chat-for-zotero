@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here.
 
+## [0.6.2] - 2026-08-25
+
+### Fixed
+
+- Prevented the **Back up note** and **Attach** button borders from being clipped in the macOS Zotero compose toolbar.
+
 ## [0.6.1] - 2026-08-25
 
 ### Changed
