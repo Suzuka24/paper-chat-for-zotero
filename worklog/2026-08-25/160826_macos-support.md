@@ -48,6 +48,7 @@
 - 2026-08-25 16:38：第二次 CI 表明 zlib Deflate 输出仍存在宿主差异；XPI 内容仅约 1.5 MB，改为 `ZIP_STORED` 消除压缩库差异，确保逐字节跨平台稳定。
 - 2026-08-25 16:40：Windows 在无压缩后仍产生不同摘要；CI 改为失败时也上传 XPI，用实际产物对比剩余差异。
 - 2026-08-25 16:44：对比失败任务上传的 Windows XPI 与本机 XPI，确认文件内容和 ZIP 元数据一致，仅条目顺序不同；根因是 `Path` 在 Windows 与 POSIX 上的排序规则不同。构建器改为按 XPI 内部 POSIX 路径字符串排序。
+- 2026-08-25 16:47：GitHub Actions 运行 `32827311013` 的 Windows 与 macOS job 均通过；确认远端 `main` 未产生新提交，可直接 fast-forward 发布。
 
 ## 总结
 
@@ -64,9 +65,9 @@
 - XPI SHA-256：`6edbc37ddb8bad07d13aadac099905326cc65e44ebe51b30547e613d7c173a9c`。
 - macOS 首次安装、重复升级、`launchd` 重载、token 复用、bridge 健康检查、模型读取和真实对话通过。
 - Zotero 9.0.6 首次安装、0.5.0 → 0.6.0 覆盖升级、连接、PDF 对话、页码链接和历史保留通过。
+- GitHub Actions Windows 与 macOS 双平台验证均通过（run `32827311013`）。
 
 ### 未完成事项或剩余风险
 
 - Intel Mac 的安装资产选择已实现但缺少 Intel 实机验证。
-- Windows 兼容性依赖远端 `windows-latest` CI 验证；本机没有 PowerShell 环境，已修复 CI 暴露的 ZIP 平台元数据、zlib 和路径排序差异并等待复验。
-- 远端分支、PR、CI 与 Release 状态将在发布步骤完成后补充。
+- `main`、临时 Draft PR 与 Release 状态将在发布步骤完成后补充。
