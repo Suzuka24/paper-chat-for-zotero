@@ -86,8 +86,11 @@ def main() -> int:
     update = updates["addons"][plugin_id]["updates"][0]
     if update["version"] != manifest["version"]:
         raise RuntimeError("updates.json version does not match manifest.json.")
-    if update["update_hash"] != f"sha256:{second_hash}":
-        raise RuntimeError("updates.json hash does not match the XPI.")
+    built_hash = f"sha256:{second_hash}"
+    if update["update_hash"] != built_hash:
+        raise RuntimeError(
+            f"updates.json hash {update['update_hash']} does not match the XPI {built_hash}."
+        )
 
     print(f"All checks passed for {plugin_id} {manifest['version']}.")
     print(f"SHA-256: {second_hash}")

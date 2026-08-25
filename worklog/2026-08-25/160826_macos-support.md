@@ -45,6 +45,7 @@
 - 2026-08-25 16:28：使用 `--skip-download` 验证安装器幂等升级；原 token 保持不变，`launchd` 正常重载。Zotero 覆盖升级到 0.6.0 后历史问题、回答和页码链接完整保留。
 - 2026-08-25 16:32：调整安装器的 Python 运行时发现逻辑；由 macOS 系统 Python 3.9 启动时可自动选中已安装的 Python 3.12，文档命令无需指定小版本。
 - 2026-08-25 16:36：首次远端 CI 中 macOS 通过、Windows 的 XPI hash 不一致；定位到 `ZipInfo.create_system` 继承宿主平台，已固定为 Unix ZIP 元数据以实现跨系统可复现构建。
+- 2026-08-25 16:38：第二次 CI 表明 zlib Deflate 输出仍存在宿主差异；XPI 内容仅约 1.5 MB，改为 `ZIP_STORED` 消除压缩库差异，确保逐字节跨平台稳定。
 
 ## 总结
 
@@ -65,5 +66,5 @@
 ### 未完成事项或剩余风险
 
 - Intel Mac 的安装资产选择已实现但缺少 Intel 实机验证。
-- Windows 兼容性依赖远端 `windows-latest` CI 验证；本机没有 PowerShell 环境，首次运行暴露的跨系统 ZIP 元数据差异已修复并等待复验。
+- Windows 兼容性依赖远端 `windows-latest` CI 验证；本机没有 PowerShell 环境，前两次运行暴露的 ZIP 平台元数据和 zlib 差异已修复并等待复验。
 - 远端分支、PR、CI 与 Release 状态将在发布步骤完成后补充。
