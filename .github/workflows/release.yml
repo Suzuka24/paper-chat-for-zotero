@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate tag and package
+        shell: pwsh
+        run: |
+          $manifest = Get-Content plugin/manifest.json -Raw | ConvertFrom-Json
+          if ($env:GITHUB_REF_NAME -ne "v$($manifest.version)") {
+            throw "Tag $env:GITHUB_REF_NAME does not match manifest version $($manifest.version)."
+          }
+          ./scripts/Test.ps1
+          $hash = (Get-FileHash dist/paper-chat-for-zotero.xpi -Algorithm SHA256).Hash.ToLowerInvariant()
+          [IO.File]::WriteAllText('dist/paper-chat-for-zotero.sha256', "$hash  paper-chat-for-zotero.xpi`n", [Text.UTF8Encoding]::new($false))
+      - name: Create GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $arguments = @(
+            'release', 'create', $env:GITHUB_REF_NAME,
+            'dist/paper-chat-for-zotero.xpi',
+            'dist/paper-chat-for-zotero.sha256',
+            '--verify-tag',
+            '--title', "Paper Chat for Zotero $env:GITHUB_REF_NAME",
+            '--generate-notes'
+          )
+          if ($env:GITHUB_REF_NAME.Contains('-')) { $arguments += '--prerelease' }
+          gh @arguments

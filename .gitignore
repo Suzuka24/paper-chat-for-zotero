@@ -1,0 +1,11 @@
+bridge/codex-app-server.exe
+bridge/bridge.log
+bridge/token.txt
+dist/
+__pycache__/
+*.pyc
+.tmp-katex/
+katex-*.tgz
+*.download
+.DS_Store
+Thumbs.db

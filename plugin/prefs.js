@@ -1,0 +1,8 @@
+pref("extensions.zotero-codex-chat.bridgeURL", "http://127.0.0.1:23120");
+pref("extensions.zotero-codex-chat.bridgeToken", "");
+pref("extensions.zotero-codex-chat.model", "");
+pref("extensions.zotero-codex-chat.effort", "medium");
+pref("extensions.zotero-codex-chat.generalPrompt", "");
+pref("extensions.zotero-codex-chat.defaultLanguage", "zh-CN");
+pref("extensions.zotero-codex-chat.tone", "academic");
+pref("extensions.zotero-codex-chat.panelHeight", 900);

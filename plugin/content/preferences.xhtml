@@ -1,0 +1,35 @@
+<vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" xmlns:html="http://www.w3.org/1999/xhtml" id="zcc-preferences" onload="ZoteroCodexChatPreferences.init(document)">
+  <html:div class="zcc-pref-card">
+    <html:h2 id="zcc-pref-title">Paper Chat for Zotero</html:h2>
+    <html:p id="zcc-pref-description" class="zcc-pref-description">These rules are added to every paper conversation. Changes are saved immediately and apply from the next question.</html:p>
+
+    <html:label id="zcc-pref-language-label" class="zcc-pref-label" for="zcc-pref-language">Default response language</html:label>
+    <html:select id="zcc-pref-language" class="zcc-pref-control">
+      <html:option value="auto">Follow the question language</html:option>
+      <html:option value="zh-CN">简体中文</html:option>
+      <html:option value="en">English</html:option>
+      <html:option value="ja">日本語</html:option>
+      <html:option value="de">Deutsch</html:option>
+      <html:option value="fr">Français</html:option>
+      <html:option value="es">Español</html:option>
+      <html:option value="ko">한국어</html:option>
+    </html:select>
+
+    <html:label id="zcc-pref-tone-label" class="zcc-pref-label" for="zcc-pref-tone">Style and tone</html:label>
+    <html:select id="zcc-pref-tone" class="zcc-pref-control">
+      <html:option value="academic">Academic and rigorous</html:option>
+      <html:option value="concise">Concise and direct</html:option>
+      <html:option value="tutorial">Tutorial</html:option>
+      <html:option value="critical">Critical analysis</html:option>
+    </html:select>
+
+    <html:label id="zcc-pref-prompt-label" class="zcc-pref-label" for="zcc-pref-prompt">General prompt / persistent rules</html:label>
+    <html:textarea id="zcc-pref-prompt" class="zcc-pref-prompt" placeholder="For example: start with a one-sentence conclusion; cite page numbers when comparing methods; clearly mark uncertainty."></html:textarea>
+    <html:p id="zcc-pref-help" class="zcc-pref-help">Use this for long-term preferences. The current paper, read-only safety rules, and your current question are still added automatically.</html:p>
+
+    <html:div class="zcc-pref-actions">
+      <html:button id="zcc-pref-reset" type="button">Restore defaults</html:button>
+      <html:span id="zcc-pref-status" role="status">Settings saved automatically</html:span>
+    </html:div>
+  </html:div>
+</vbox>

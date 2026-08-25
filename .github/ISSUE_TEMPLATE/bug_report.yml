@@ -1,0 +1,45 @@
+name: Bug report
+description: Report a reproducible problem in Paper Chat for Zotero
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Do not include bridge tokens, Codex authentication files, private papers, or personal Zotero data."
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      placeholder: 0.5.0
+    validations:
+      required: true
+  - type: input
+    id: zotero-version
+    attributes:
+      label: Zotero version and UI language
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Windows and Python versions
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior and sanitized logs
+    validations:
+      required: true

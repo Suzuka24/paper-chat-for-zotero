@@ -1,0 +1,82 @@
+#zcc-preferences {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 780px;
+    padding: 12px 18px 24px;
+}
+
+.zcc-pref-card {
+    display: grid;
+    grid-template-columns: minmax(150px, 190px) minmax(260px, 1fr);
+    gap: 12px 18px;
+    align-items: start;
+}
+
+.zcc-pref-card h2,
+.zcc-pref-description,
+.zcc-pref-help,
+.zcc-pref-actions {
+    grid-column: 1 / -1;
+}
+
+.zcc-pref-card h2 {
+    margin: 0 0 2px;
+    font-size: 20px;
+}
+
+.zcc-pref-description,
+.zcc-pref-help {
+    margin: 0;
+    color: var(--fill-secondary, #64748b);
+    line-height: 1.55;
+}
+
+.zcc-pref-label {
+    padding-top: 7px;
+    font-weight: 600;
+}
+
+.zcc-pref-control,
+.zcc-pref-prompt {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    padding: 7px 9px;
+    border: 1px solid var(--fill-quinary, #cbd5e1);
+    border-radius: 6px;
+    color: inherit;
+    background: var(--material-background, #fff);
+    font: inherit;
+}
+
+.zcc-pref-prompt {
+    min-height: 150px;
+    resize: vertical;
+    line-height: 1.55;
+}
+
+.zcc-pref-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+#zcc-pref-reset {
+    padding: 6px 12px;
+}
+
+#zcc-pref-status {
+    color: var(--fill-secondary, #64748b);
+    font-size: 12px;
+}
+
+@media (max-width: 620px) {
+    .zcc-pref-card {
+        grid-template-columns: 1fr;
+    }
+
+    .zcc-pref-card > * {
+        grid-column: 1;
+    }
+}
