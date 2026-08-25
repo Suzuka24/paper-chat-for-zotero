@@ -49,6 +49,7 @@
 - 2026-08-25 16:40：Windows 在无压缩后仍产生不同摘要；CI 改为失败时也上传 XPI，用实际产物对比剩余差异。
 - 2026-08-25 16:44：对比失败任务上传的 Windows XPI 与本机 XPI，确认文件内容和 ZIP 元数据一致，仅条目顺序不同；根因是 `Path` 在 Windows 与 POSIX 上的排序规则不同。构建器改为按 XPI 内部 POSIX 路径字符串排序。
 - 2026-08-25 16:47：GitHub Actions 运行 `32827311013` 的 Windows 与 macOS job 均通过；确认远端 `main` 未产生新提交，可直接 fast-forward 发布。
+- 2026-08-25 16:49：将 `a0f7621` 直接 fast-forward push 到 `main`，未执行 PR 合并操作；GitHub 因 Draft PR 的提交已全部可达而自动将其标记为 merged。`main` push CI 运行 `32827402350` 的双平台 job 均通过。
 
 ## 总结
 
@@ -65,9 +66,9 @@
 - XPI SHA-256：`6edbc37ddb8bad07d13aadac099905326cc65e44ebe51b30547e613d7c173a9c`。
 - macOS 首次安装、重复升级、`launchd` 重载、token 复用、bridge 健康检查、模型读取和真实对话通过。
 - Zotero 9.0.6 首次安装、0.5.0 → 0.6.0 覆盖升级、连接、PDF 对话、页码链接和历史保留通过。
-- GitHub Actions Windows 与 macOS 双平台验证均通过（run `32827311013`）。
+- GitHub Actions Windows 与 macOS 双平台验证均通过（分支 run `32827311013`、`main` run `32827402350`）。
 
 ### 未完成事项或剩余风险
 
 - Intel Mac 的安装资产选择已实现但缺少 Intel 实机验证。
-- `main`、临时 Draft PR 与 Release 状态将在发布步骤完成后补充。
+- `v0.6.0` Release 状态将在发布步骤完成后补充。
