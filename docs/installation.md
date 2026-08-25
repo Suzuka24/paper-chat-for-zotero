@@ -57,6 +57,8 @@ python3 Install-macOS.py --no-auto-start
 
 `0.4.x` 开发版的插件 ID 与公开版不同。首次升级到 `0.5.0` 时，请先在插件管理器移除旧开发版，再安装新 XPI。原有偏好键和对话数据目录仍保留，可继续读取；新的 Codex 对话项目目录名为 `Paper Chat for Zotero`。
 
+升级到 `0.6.1` 后，插件会在首次连接桥接服务时归档已有的插件 Codex 任务，使其不再占用 Codex 的“最近”列表。Zotero 中的消息和续聊上下文不会被删除；如本地历史中包含 Codex thread ID，迁移前会一次性备份为 `<Zotero 数据目录>/zotero-codex-chat/conversations.pre-thread-lifecycle-v1.json`。
+
 ## 4. 手动控制桥接
 
 ```powershell

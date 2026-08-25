@@ -49,6 +49,7 @@ def main() -> int:
         "bridge/server.py",
         "scripts/build_xpi.py",
         "scripts/test.py",
+        "scripts/test_bridge_lifecycle.py",
         "Install-macOS.py",
     ):
         py_compile.compile(str(PROJECT_ROOT / script), doraise=True)
@@ -61,6 +62,8 @@ def main() -> int:
             "bridge/Stop-Bridge.sh",
         ):
             run("sh", "-n", script)
+
+    run(sys.executable, str(PROJECT_ROOT / "scripts" / "test_bridge_lifecycle.py"))
 
     manifest = json.loads((PROJECT_ROOT / "plugin" / "manifest.json").read_text(encoding="utf-8"))
     updates = json.loads((PROJECT_ROOT / "updates.json").read_text(encoding="utf-8"))

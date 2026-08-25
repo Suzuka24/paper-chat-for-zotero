@@ -9,6 +9,8 @@
 
 The current PDF is parsed locally and supplied to Codex when a conversation starts. A scanned PDF without a text layer may require OCR first.
 
+After each completed response, the corresponding Codex task is archived so it does not remain in Codex **Recent**. Continuing the conversation in Zotero automatically restores its context and archives it again afterward. Deleting a Zotero conversation also permanently deletes the corresponding Codex thread after confirmation.
+
 ## Add context
 
 - Select text in the PDF and choose **Ask Codex**.

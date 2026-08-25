@@ -54,8 +54,10 @@ var ZoteroCodexChatPlugin = (() => {
         renameTitle: "Rename conversation",
         renamePrompt: "Enter a new conversation name:",
         deleteTitle: "Delete conversation",
-        deleteConfirm: "Delete “{title}”? This cannot be undone.",
+        deleteConfirm: "Delete “{title}” from Zotero and Codex? This cannot be undone.",
         deleted: "Conversation deleted",
+        deleteFailed: "Conversation was not deleted: {error}",
+        lifecycleMigrationFailed: "Conversation cleanup will be retried: {error}",
         jumpTitle: "Go to PDF page {page}",
         jumped: "Jumped to PDF page {page}",
         jumpFailed: "Page navigation failed: {error}",
@@ -160,6 +162,7 @@ var ZoteroCodexChatPlugin = (() => {
         path: "",
         loaded: false,
         writeChain: Promise.resolve(),
+        lifecycleMigration: null,
 
         async load() {
             if (this.loaded) return;
@@ -173,7 +176,7 @@ var ZoteroCodexChatPlugin = (() => {
                     this.data = parsed;
                 }
             } catch (error) {
-                if (!/not found|no such file|because it does not exist/i.test(String(error))) Zotero.logError(error);
+                if (!/not found|no such file|does not exist|NS_ERROR_FILE_NOT_FOUND/i.test(String(error))) Zotero.logError(error);
             }
             this.loaded = true;
         },
@@ -206,6 +209,56 @@ var ZoteroCodexChatPlugin = (() => {
 
         flush() {
             return this.writeChain.catch(error => Zotero.logError(error));
+        },
+
+        threadIds() {
+            const ids = [];
+            for (const paper of Object.values(this.data.papers || {})) {
+                for (const conversation of paper?.conversations || []) {
+                    if (typeof conversation?.threadId === "string" && conversation.threadId) ids.push(conversation.threadId);
+                }
+            }
+            return [...new Set(ids)];
+        },
+
+        async ensureLifecycleBackup() {
+            if (!this.path) return;
+            const backupPath = this.path.replace(/\.json$/i, ".pre-thread-lifecycle-v1.json");
+            try {
+                await Zotero.File.getContentsAsync(backupPath);
+                return;
+            } catch (error) {
+                if (!/not found|no such file|does not exist|NS_ERROR_FILE_NOT_FOUND/i.test(String(error))) throw error;
+            }
+            const snapshot = await Zotero.File.getContentsAsync(this.path);
+            await Zotero.File.putContentsAsync(backupPath, snapshot);
+        },
+
+        async migrateThreadLifecycle(win) {
+            if (Number(this.data.threadLifecycleVersion || 0) >= 1) return;
+            if (this.lifecycleMigration) return this.lifecycleMigration;
+            this.lifecycleMigration = (async () => {
+                const threadIds = this.threadIds();
+                if (threadIds.length) {
+                    await this.ensureLifecycleBackup();
+                    const response = await bridgeFetch(win, "/threads/archive", {
+                        method: "POST",
+                        body: JSON.stringify({ threadIds }),
+                    });
+                    const result = await response.json();
+                    if (result.failed?.length) {
+                        throw new Error(result.failed.map(entry => `${entry.threadId}: ${entry.error}`).join("; "));
+                    }
+                }
+                this.data.threadLifecycleVersion = 1;
+                await this.writeChain.catch(error => Zotero.logError(error));
+                await Zotero.File.putContentsAsync(this.path, JSON.stringify(this.data, null, 2));
+            })();
+            try {
+                await this.lifecycleMigration;
+            } finally {
+                this.lifecycleMigration = null;
+            }
         },
     };
 
@@ -1207,8 +1260,21 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
 
         async deleteConversation() {
             if (!this.activeConversation || !this.paperHistory || this.paperHistory.conversations.length <= 1) return;
-            const accepted = Services.prompt.confirm(this.win, ui("deleteTitle", "删除对话"), ui("deleteConfirm", `确定删除“${this.activeConversation.title}”吗？此操作无法撤销。`, { title: this.activeConversation.title }));
+            const accepted = Services.prompt.confirm(this.win, ui("deleteTitle", "删除对话"), ui("deleteConfirm", `确定从 Zotero 和 Codex 中删除“${this.activeConversation.title}”吗？此操作无法撤销。`, { title: this.activeConversation.title }));
             if (!accepted) return;
+            const threadId = this.activeConversation.threadId;
+            if (threadId) {
+                try {
+                    await bridgeFetch(this.win, "/thread/delete", {
+                        method: "POST",
+                        body: JSON.stringify({ threadId }),
+                    });
+                } catch (error) {
+                    this.status.textContent = ui("deleteFailed", `未删除对话：${error.message}`, { error: error.message });
+                    Zotero.logError(error);
+                    return;
+                }
+            }
             const index = this.paperHistory.conversations.indexOf(this.activeConversation);
             this.paperHistory.conversations.splice(index, 1);
             this.activeConversation = this.paperHistory.conversations[Math.max(0, index - 1)];
@@ -1302,6 +1368,12 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
                 }
                 if (this.model.value) setPref("model", this.model.value);
                 this.status.textContent = ui("connected", "已连接本地 Codex");
+                try {
+                    await historyStore.migrateThreadLifecycle(this.win);
+                } catch (error) {
+                    Zotero.logError(error);
+                    this.status.textContent = ui("lifecycleMigrationFailed", `会话整理将在稍后重试：${error.message}`, { error: error.message });
+                }
             } catch (error) {
                 this.model.replaceChildren(html(this.doc, "option", "", ui("disconnected", "Codex 未连接")));
                 this.status.textContent = ui("runBridge", "请运行 Start-Bridge.ps1");

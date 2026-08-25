@@ -19,6 +19,7 @@ from typing import Any
 
 
 LOG = logging.getLogger("zotero-codex-bridge")
+SESSION_SOURCE = "app-server"
 
 
 class BridgeError(RuntimeError):
@@ -46,7 +47,13 @@ class CodexAppServer:
         LOG.info("Starting Codex App Server: %s", self.executable)
         creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
         self.process = subprocess.Popen(
-            [str(self.executable), "--listen", "stdio://", "--session-source", "vscode"],
+            [
+                str(self.executable),
+                "--listen",
+                "stdio://",
+                "--session-source",
+                SESSION_SOURCE,
+            ],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -65,7 +72,7 @@ class CodexAppServer:
                 "clientInfo": {
                     "name": "paper_chat_for_zotero",
                     "title": "Paper Chat for Zotero",
-                    "version": "0.5.0",
+                    "version": "0.6.1",
                 }
             },
             timeout=30,
@@ -203,7 +210,14 @@ class CodexAppServer:
                 params["model"] = model
             if cwd:
                 params["cwd"] = cwd
-            self.request("thread/resume", params, timeout=60)
+            try:
+                self.request("thread/resume", params, timeout=60)
+            except BridgeError as resume_error:
+                try:
+                    self.request("thread/unarchive", {"threadId": thread_id}, timeout=30)
+                except BridgeError:
+                    raise resume_error
+                self.request("thread/resume", params, timeout=60)
             with self._state_lock:
                 self._loaded_threads.add(thread_id)
             self._set_thread_name(thread_id, body.get("threadName"))
@@ -249,6 +263,7 @@ class CodexAppServer:
         events: queue.Queue[dict[str, Any]] = queue.Queue()
         with self._state_lock:
             self._subscribers.setdefault(thread_id, set()).add(events)
+        turn_finished = False
         try:
             input_items: list[dict[str, Any]] = [{"type": "text", "text": prompt}]
             image_suffixes = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
@@ -287,6 +302,7 @@ class CodexAppServer:
                     yield {"type": "delta", "text": event_params.get("delta", "")}
                 elif method == "turn/completed":
                     turn = event_params.get("turn") or {}
+                    turn_finished = True
                     yield {
                         "type": "done",
                         "threadId": thread_id,
@@ -305,6 +321,43 @@ class CodexAppServer:
                     subscribers.discard(events)
                     if not subscribers:
                         self._subscribers.pop(thread_id, None)
+            if turn_finished:
+                try:
+                    self.archive_thread(thread_id)
+                except Exception as exc:
+                    LOG.warning("Unable to archive completed Codex thread %s: %s", thread_id, exc)
+
+    def archive_thread(self, thread_id: str) -> None:
+        try:
+            self.request("thread/archive", {"threadId": thread_id}, timeout=30)
+        except BridgeError as archive_error:
+            try:
+                self.request("thread/unarchive", {"threadId": thread_id}, timeout=30)
+            except BridgeError:
+                if "no rollout found" in str(archive_error).lower():
+                    with self._state_lock:
+                        self._loaded_threads.discard(thread_id)
+                    return
+                raise archive_error
+            self.request("thread/archive", {"threadId": thread_id}, timeout=30)
+        with self._state_lock:
+            self._loaded_threads.discard(thread_id)
+
+    def archive_threads(self, thread_ids: list[str]) -> dict[str, Any]:
+        archived: list[str] = []
+        failed: list[dict[str, str]] = []
+        for thread_id in dict.fromkeys(thread_ids):
+            try:
+                self.archive_thread(thread_id)
+                archived.append(thread_id)
+            except Exception as exc:
+                failed.append({"threadId": thread_id, "error": str(exc)})
+        return {"archived": archived, "failed": failed}
+
+    def delete_thread(self, thread_id: str) -> None:
+        self.request("thread/delete", {"threadId": thread_id}, timeout=30)
+        with self._state_lock:
+            self._loaded_threads.discard(thread_id)
 
     def interrupt(self, thread_id: str, turn_id: str) -> None:
         self.request(
@@ -433,10 +486,31 @@ class RequestHandler(BaseHTTPRequestHandler):
         if not self._authorized():
             self._send_json(HTTPStatus.UNAUTHORIZED, {"error": "unauthorized"})
             return
+        response_started = False
         try:
             body = self._read_json()
             if self.path == "/interrupt":
                 self.bridge.app.interrupt(str(body["threadId"]), str(body["turnId"]))
+                self._send_json(HTTPStatus.OK, {"ok": True})
+                return
+            if self.path == "/threads/archive":
+                raw_thread_ids = body.get("threadIds")
+                if not isinstance(raw_thread_ids, list) or len(raw_thread_ids) > 1000:
+                    raise BridgeError("threadIds 必须是最多包含 1000 项的数组")
+                thread_ids = [
+                    value
+                    for value in raw_thread_ids
+                    if isinstance(value, str) and 0 < len(value) <= 200
+                ]
+                if len(thread_ids) != len(raw_thread_ids):
+                    raise BridgeError("threadIds 包含无效值")
+                self._send_json(HTTPStatus.OK, self.bridge.app.archive_threads(thread_ids))
+                return
+            if self.path == "/thread/delete":
+                thread_id = body.get("threadId")
+                if not isinstance(thread_id, str) or not (0 < len(thread_id) <= 200):
+                    raise BridgeError("threadId 无效")
+                self.bridge.app.delete_thread(thread_id)
                 self._send_json(HTTPStatus.OK, {"ok": True})
                 return
             if self.path != "/chat":
@@ -447,6 +521,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_header("Cache-Control", "no-store")
             self.send_header("Connection", "close")
             self.end_headers()
+            response_started = True
             for event in self.bridge.app.stream_chat(body):
                 line = json.dumps(event, ensure_ascii=False).encode("utf-8") + b"\n"
                 self.wfile.write(line)
@@ -456,7 +531,9 @@ class RequestHandler(BaseHTTPRequestHandler):
             LOG.info("Client disconnected from chat stream")
         except Exception as exc:
             LOG.exception("POST %s failed", self.path)
-            if not self.wfile.closed:
+            if not response_started:
+                self._send_json(HTTPStatus.BAD_GATEWAY, {"error": str(exc)})
+            elif not self.wfile.closed:
                 try:
                     line = json.dumps({"type": "error", "error": str(exc)}, ensure_ascii=False)
                     self.wfile.write(line.encode("utf-8") + b"\n")

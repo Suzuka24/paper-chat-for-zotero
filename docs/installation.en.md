@@ -33,6 +33,8 @@ In Zotero, choose `Tools → Plugins → gear menu → Install Plugin From File`
 
 Close Zotero, rerun the installer for your platform, install the newly built XPI over the existing public version, and restart Zotero. When moving from a `0.4.x` development build to `0.5.0` or newer, remove the old development plugin first because the permanent public plugin ID changed.
 
+On first bridge connection after upgrading to `0.6.1`, existing plugin-managed Codex tasks are archived so they no longer occupy Codex **Recent**. Zotero messages and resumable context are retained. If the local history contains Codex thread IDs, it is first backed up once as `<Zotero data directory>/zotero-codex-chat/conversations.pre-thread-lifecycle-v1.json`.
+
 ## Bridge controls
 
 ```powershell

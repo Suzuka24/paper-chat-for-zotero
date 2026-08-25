@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented here.
 
+## [0.6.1] - 2026-08-25
+
+### Changed
+
+- Paper conversations are archived in Codex after each completed response, keeping them out of the default **Recent** list while preserving resumable context.
+- Existing plugin-managed Codex threads are archived once during upgrade after an automatic local conversation-history backup.
+- Deleting a Zotero conversation now also deletes its corresponding Codex thread after confirmation; a bridge failure leaves the Zotero conversation untouched.
+
+### Fixed
+
+- New plugin threads now use the non-interactive App Server source instead of being identified as VS Code tasks.
+
 ## [0.6.0] - 2026-08-25
 
 ### Added
