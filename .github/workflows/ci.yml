@@ -23,6 +23,7 @@ jobs:
         shell: pwsh
         run: ./scripts/Test.ps1
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: paper-chat-for-zotero
           path: dist/paper-chat-for-zotero.xpi
@@ -40,6 +41,7 @@ jobs:
       - name: Validate and build
         run: python scripts/test.py
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: paper-chat-for-zotero-macos
           path: dist/paper-chat-for-zotero.xpi
