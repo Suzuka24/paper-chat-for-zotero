@@ -41,5 +41,7 @@ jobs:
             '--title', "Paper Chat for Zotero $env:GITHUB_REF_NAME",
             '--generate-notes'
           )
-          if ($env:GITHUB_REF_NAME.Contains('-')) { $arguments += '--prerelease' }
+          if ($env:GITHUB_REF_NAME.Contains('-') -or $env:GITHUB_REF_NAME -eq 'v0.5.0') {
+            $arguments += '--prerelease'
+          }
           gh @arguments
