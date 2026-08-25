@@ -50,6 +50,7 @@
 - 2026-08-25 16:44：对比失败任务上传的 Windows XPI 与本机 XPI，确认文件内容和 ZIP 元数据一致，仅条目顺序不同；根因是 `Path` 在 Windows 与 POSIX 上的排序规则不同。构建器改为按 XPI 内部 POSIX 路径字符串排序。
 - 2026-08-25 16:47：GitHub Actions 运行 `32827311013` 的 Windows 与 macOS job 均通过；确认远端 `main` 未产生新提交，可直接 fast-forward 发布。
 - 2026-08-25 16:49：将 `a0f7621` 直接 fast-forward push 到 `main`，未执行 PR 合并操作；GitHub 因 Draft PR 的提交已全部可达而自动将其标记为 merged。`main` push CI 运行 `32827402350` 的双平台 job 均通过。
+- 2026-08-25 16:52：最终提交 `68fff2c` 的 `main` CI 运行 `32827520177` 双平台通过；创建并推送 `v0.6.0`，Release workflow `32827594550` 验证并发布 XPI 与 SHA-256 文件成功。
 
 ## 总结
 
@@ -70,5 +71,4 @@
 
 ### 未完成事项或剩余风险
 
-- Intel Mac 的安装资产选择已实现但缺少 Intel 实机验证。
-- `v0.6.0` Release 状态将在发布步骤完成后补充。
+- Intel Mac 的安装资产选择已实现但缺少 Intel 实机验证；Apple Silicon 本机和 Windows CI 均已验证。
