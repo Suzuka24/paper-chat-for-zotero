@@ -4,6 +4,8 @@
 
 Chat with the paper currently open in Zotero, directly from its native sidebar. Paper Chat for Zotero reuses your local Codex sign-in, so it does not require an OpenAI API key or API credits.
 
+> **First-time setup:** Installing the XPI alone is not sufficient. Download the source archive and run the Windows or macOS installer first so that the local bridge is installed, then install the generated XPI in Zotero. See [Quick install](#quick-install).
+
 ![Paper Chat for Zotero in the Zotero PDF reader](docs/assets/paper-chat-for-zotero.png)
 
 ## Highlights

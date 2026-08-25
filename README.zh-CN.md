@@ -4,6 +4,8 @@
 
 在 Zotero 原生右侧边栏中，使用本机 Codex 与当前论文对话。插件复用本机 Codex 登录，不需要 OpenAI API key 或 API 余额。
 
+> **首次安装提示：** 仅安装 XPI 无法使用。请先下载源码包并运行 Windows 或 macOS 安装器以安装本地 bridge，再在 Zotero 中安装生成的 XPI。详见[快速安装](#快速安装)。
+
 ![Zotero PDF 阅读器中的 Paper Chat for Zotero](docs/assets/paper-chat-for-zotero.png)
 
 ## 主要功能
