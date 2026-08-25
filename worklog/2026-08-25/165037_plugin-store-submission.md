@@ -30,7 +30,24 @@
 ## 实施记录
 
 - 2026-08-25 16:50：确认旧 `zotero-chinese/zotero-plugins` 已停止接收新插件，当前应提交至 `syt2/zotero-addons-scraper`；确认 scraper 支持 Zotero 9、GitHub Release XPI 和当前插件 manifest。
+- 2026-08-25 16:51：在中英文 README 顶部明确“仅安装 XPI 无法完成首次安装”，插件仓库测试通过并直接 fast-forward push 到 `main`（`48d23d5`）。
+- 2026-08-25 16:52：完善 GitHub About 双语描述、Release 主页及 `zotero`、`zotero-plugin`、`codex`、`ai`、`research` topics；重写 v0.6.0 Release 安装说明，提供固定源码包和中英文指南链接。插件仓库 `main` CI `32828793878` 双平台通过。
+- 2026-08-25 16:53：fork `syt2/zotero-addons-scraper`，在 `add-paper-chat-for-zotero` 分支新增 `addons/Suzuka24@paper-chat-for-zotero`，标签为 `ai`、`reader`；官方 tag review 与相关 7 个单元测试通过。
+- 2026-08-25 16:54：创建正式非 Draft PR `syt2/zotero-addons-scraper#206`；base 为上游 `master`，head 为 `Suzuka24:add-paper-chat-for-zotero`，自动 Addon Tag Review `32828972485` 通过，当前状态可合并。
 
 ## 总结
 
-待操作完成后补充。
+### 实际完成内容
+
+- 完善插件仓库中英文 README、GitHub About、topics 和 v0.6.0 Release 首次安装说明。
+- 创建并验证社区收录条目，向当前数据源仓库提交正式 PR：<https://github.com/syt2/zotero-addons-scraper/pull/206>。
+
+### 验证结果
+
+- 插件仓库 `scripts/test.py`、Windows/macOS CI 通过。
+- 社区条目官方 tag review、7 个相关单元测试及 PR 自动检查通过。
+- PR 仅新增一个预期文件，提交身份、base/head 和标签均正确。
+
+### 未完成事项或剩余风险
+
+- PR 已满足合并条件，但最终合并权限属于 `syt2/zotero-addons-scraper` 维护者；合并及其后定时抓取完成后，插件才会出现在 Zotero 中文社区页面。
