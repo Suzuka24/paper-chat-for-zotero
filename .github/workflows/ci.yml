@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  test-windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,4 +25,21 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: paper-chat-for-zotero
+          path: dist/paper-chat-for-zotero.xpi
+
+  test-macos:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate and build
+        run: python scripts/test.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper-chat-for-zotero-macos
           path: dist/paper-chat-for-zotero.xpi

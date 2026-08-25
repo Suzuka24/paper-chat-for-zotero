@@ -266,13 +266,20 @@ var ZoteroCodexChatPlugin = (() => {
     }
 
     async function loadInstalledBridgeToken() {
-        if (String(pref("bridgeToken", "")).trim() || !Zotero.isWin) return;
-        const localAppData = Services.env.get("LOCALAPPDATA");
-        if (!localAppData) return;
-        const candidates = [
-            `${localAppData}\\PaperChatForZotero\\token.txt`,
-            `${localAppData}\\ZoteroCodexChat\\token.txt`,
-        ];
+        if (String(pref("bridgeToken", "")).trim()) return;
+        const candidates = [];
+        if (Zotero.isWin) {
+            const localAppData = Services.env.get("LOCALAPPDATA");
+            if (localAppData) {
+                candidates.push(
+                    `${localAppData}\\PaperChatForZotero\\token.txt`,
+                    `${localAppData}\\ZoteroCodexChat\\token.txt`
+                );
+            }
+        } else if (Zotero.isMac) {
+            const home = Services.env.get("HOME");
+            if (home) candidates.push(`${home}/Library/Application Support/PaperChatForZotero/token.txt`);
+        }
         for (const path of candidates) {
             try {
                 const token = String(await Zotero.File.getContentsAsync(path)).trim();

@@ -1,6 +1,6 @@
 # Privacy
 
-Paper Chat for Zotero runs a Zotero extension and a local Windows bridge. It does not operate a project-owned cloud service.
+Paper Chat for Zotero runs a Zotero extension and a local Windows or macOS bridge. It does not operate a project-owned cloud service.
 
 ## Data sent for model processing
 
@@ -18,14 +18,14 @@ This processing is governed by the policies and controls of the ChatGPT/Codex ac
 - Zotero conversation metadata: `<Zotero data directory>/zotero-codex-chat/conversations.json`.
 - Clipboard-created temporary attachments: `<Zotero data directory>/zotero-codex-chat/clipboard-files/`.
 - Codex project working directory: `<Zotero data directory>/Paper Chat for Zotero/`.
-- Bridge program, log, App Server binary, and local token: `%LOCALAPPDATA%\PaperChatForZotero\`.
+- Bridge program, log, App Server binary, and local token: `%LOCALAPPDATA%\PaperChatForZotero\` on Windows or `~/Library/Application Support/PaperChatForZotero/` on macOS.
 - Plugin preferences: the current Zotero profile under the legacy-compatible prefix `extensions.zotero-codex-chat.*`.
 
 The local bridge token is not an OpenAI credential. It is a random per-installation secret used only to reject unauthorized requests to the loopback bridge.
 
 ## Deletion
 
-Removing the plugin and running `Uninstall-Bridge.ps1` deletes the bridge installation, log, App Server binary, and bridge token. It does not delete Zotero notes, Zotero items, conversation metadata, clipboard cache, or Codex task history. Delete those separately if required.
+Removing the plugin and running `Uninstall-Bridge.ps1` on Windows or `Uninstall-Bridge.sh` on macOS deletes the bridge installation, log, App Server binary, and bridge token. It does not delete Zotero notes, Zotero items, conversation metadata, clipboard cache, or Codex task history. Delete those separately if required.
 
 ## Network scope
 

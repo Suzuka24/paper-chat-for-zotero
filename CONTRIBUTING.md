@@ -4,10 +4,10 @@ Issues and pull requests are welcome.
 
 ## Development setup
 
-Requirements: Windows 10/11, Zotero 9.0.x, Python 3.10+, and a valid local Codex sign-in.
+Requirements: Windows 10/11 or macOS, Zotero 9.0.x, Python 3.10+, Node.js, and a valid local Codex sign-in.
 
 1. Fork and clone the repository.
-2. Run `Install.ps1` to install the local bridge and build a development XPI.
+2. Run `Install.ps1` on Windows or `python3 Install-macOS.py` on macOS to install the local bridge and build a development XPI.
 3. Install `dist/paper-chat-for-zotero.xpi` in a test Zotero profile.
 4. Keep changes focused and avoid committing local tokens, logs, binaries, paper files, or Zotero profile data.
 
@@ -19,7 +19,13 @@ Run before opening a pull request:
 .\scripts\Test.ps1
 ```
 
-The script checks JavaScript, Python, JSON/XML, PowerShell syntax, reproducible packaging, required XPI contents, and update metadata.
+On macOS or another POSIX development environment:
+
+```bash
+python3 scripts/test.py
+```
+
+The checks cover JavaScript, Python, JSON/XML, platform scripts, reproducible packaging, required XPI contents, and update metadata. The Windows wrapper additionally validates PowerShell syntax.
 
 ## Pull requests
 

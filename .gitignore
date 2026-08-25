@@ -1,5 +1,7 @@
 bridge/codex-app-server.exe
+bridge/codex-app-server
 bridge/bridge.log
+bridge/bridge.pid
 bridge/token.txt
 dist/
 __pycache__/

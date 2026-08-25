@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented here.
 
+## [0.6.0] - 2026-08-25
+
+### Added
+
+- Native macOS installation for Apple Silicon and Intel Macs using SHA-256-verified official Codex App Server builds.
+- User-level `launchd` startup, macOS bridge control scripts, and automatic token discovery in Zotero.
+- Cross-platform build, validation, release metadata tooling, and macOS CI coverage.
+
+### Changed
+
+- Shared package validation now runs from Python while retaining Windows PowerShell syntax checks.
+- Installation, privacy, support, and contribution documentation now covers Windows and macOS.
+
 ## [0.5.0] - 2026-08-25
 
 First public beta under the name **Paper Chat for Zotero**.

@@ -1,0 +1,68 @@
+# macOS 支持
+
+## 计划
+
+### 目标
+
+在保持现有 Windows 行为兼容的前提下，使 Paper Chat for Zotero 可在 macOS（Apple Silicon 与 Intel）安装、自动启动、连接本地 Codex App Server，并完成 Zotero 内的真实对话。
+
+### 范围
+
+- 保留现有 PowerShell 安装、构建和测试入口。
+- 新增 macOS 构建、安装、启动与卸载入口。
+- 为插件增加 macOS token 自动发现。
+- 将公共验证逻辑跨平台化，并在 GitHub Actions 中加入 macOS。
+- 更新中英文安装、使用、隐私、支持与发布文档。
+- 在本机 Zotero 9.0.6 上完成 XPI 安装和端到端验证。
+
+### 关键步骤
+
+1. 从远端重新 clone，并在 `feat/macos-support` 分支开发。
+2. 实现固定版本 Codex App Server 的 macOS 架构选择、下载与摘要校验。
+3. 使用用户级 `launchd` 管理 bridge，并确保 token 权限和回环监听边界。
+4. 构建 XPI，执行静态检查、可复现构建和 bridge 协议冒烟测试。
+5. 在 Zotero 中安装、重启并完成真实对话。
+6. 审查差异，提交、推送并核对远端 CI。
+
+### 验证方式
+
+- Python 与 JavaScript 语法检查。
+- shell 语法检查。
+- 两次构建的 XPI SHA-256 一致。
+- XPI 内容及 `updates.json` 校验通过。
+- macOS bridge `/health`、模型读取和真实对话通过。
+- Zotero 插件界面可见、连接状态正常、对话返回成功。
+- GitHub Actions 的 Windows 与 macOS job 均通过。
+
+## 实施记录
+
+- 2026-08-25 16:08：将原无 `.git` 同步目录移至废纸篓 `/Users/suzuka/.Trash/zotero-codex-chat-pre-git-20260825-160826`，从 GitHub 重新 clone 到原路径，并创建 `feat/macos-support`。
+- 2026-08-25 16:10：确认本机为 Apple Silicon、Zotero 9.0.6；系统 Python 3.9.6 不满足项目要求，后续安装器将明确检查 Python 3.10+。
+- 2026-08-25 16:13：实现 `Install-macOS.py`、macOS bridge 启停脚本、用户级 `launchd`、固定 Release 架构选择、SHA-256 校验、token `0600` 权限及 macOS token 自动发现。
+- 2026-08-25 16:14：首次安装成功；`/health`、模型列表和真实 bridge 对话均通过，返回 `MAC_BRIDGE_OK`。
+- 2026-08-25 16:18：使用 Zotero 插件管理器安装 XPI；面板自动显示“已连接本地 Codex”，对当前论文提问后获得带“第 3 页”跳转的回答。
+- 2026-08-25 16:25：版本升级为 `0.6.0`，新增跨平台测试与 release metadata 工具、macOS CI，并更新中英文文档。
+- 2026-08-25 16:28：使用 `--skip-download` 验证安装器幂等升级；原 token 保持不变，`launchd` 正常重载。Zotero 覆盖升级到 0.6.0 后历史问题、回答和页码链接完整保留。
+- 2026-08-25 16:32：调整安装器的 Python 运行时发现逻辑；由 macOS 系统 Python 3.9 启动时可自动选中已安装的 Python 3.12，文档命令无需指定小版本。
+
+## 总结
+
+### 实际完成内容
+
+- 新增 Apple Silicon/Intel macOS 安装、构建、启动、停止和卸载入口。
+- 使用固定 OpenAI Codex App Server Release、官方摘要校验、回环 bridge token 和用户级 `launchd`。
+- 保留 Windows 行为，并将测试、release metadata、CI 和文档扩展为跨平台。
+- 插件版本升级为 0.6.0。
+
+### 验证结果
+
+- Python、JavaScript、shell、JSON/XML、可复现 XPI 和更新摘要检查通过。
+- XPI SHA-256：`09dfcf284687e9c6de12de81cbf77e8e33a2a77a50c529f7145cd612b14350b9`。
+- macOS 首次安装、重复升级、`launchd` 重载、token 复用、bridge 健康检查、模型读取和真实对话通过。
+- Zotero 9.0.6 首次安装、0.5.0 → 0.6.0 覆盖升级、连接、PDF 对话、页码链接和历史保留通过。
+
+### 未完成事项或剩余风险
+
+- Intel Mac 的安装资产选择已实现但缺少 Intel 实机验证。
+- Windows 兼容性依赖远端 `windows-latest` CI 验证；本机没有 PowerShell 环境。
+- 远端分支、PR、CI 与 Release 状态将在发布步骤完成后补充。
