@@ -17,9 +17,12 @@ def main() -> int:
     source = Path(sys.argv[1]).resolve()
     output = Path(sys.argv[2]).resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
+    files = sorted(
+        ((path.relative_to(source).as_posix(), path) for path in source.rglob("*") if path.is_file()),
+        key=lambda item: item[0],
+    )
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_STORED) as archive:
-        for path in sorted(p for p in source.rglob("*") if p.is_file()):
-            relative = path.relative_to(source).as_posix()
+        for relative, path in files:
             info = zipfile.ZipInfo(relative, FIXED_TIMESTAMP)
             info.create_system = 3
             info.compress_type = zipfile.ZIP_STORED
