@@ -45,6 +45,8 @@ def main() -> int:
     for script in ("plugin/content/main.js", "plugin/content/preferences.js"):
         run("node", "--check", script)
 
+    run("node", str(PROJECT_ROOT / "scripts" / "test_markdown_renderer.js"))
+
     for script in (
         "bridge/server.py",
         "scripts/build_xpi.py",

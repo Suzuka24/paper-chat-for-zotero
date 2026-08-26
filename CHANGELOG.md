@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here.
 
+## [0.6.3] - 2026-08-26
+
+### Fixed
+
+- Preserved LaTeX norm delimiters and other inline pipes when parsing Markdown table cells.
+- Preserved explicit ordered-list numbering when explanatory paragraphs split a list into separate HTML blocks.
+
 ## [0.6.2] - 2026-08-25
 
 ### Fixed

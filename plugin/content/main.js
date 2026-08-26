@@ -494,7 +494,42 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
     }
 
     function splitTableRow(line) {
-        return line.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map(cell => cell.trim());
+        let source = line.trim();
+        if (source.startsWith("|")) source = source.slice(1);
+        if (source.endsWith("|") && source[source.length - 2] !== "\\") source = source.slice(0, -1);
+        const cells = [];
+        let cell = "";
+        let inCode = false;
+        let mathDelimiter = "";
+        for (let index = 0; index < source.length; index++) {
+            const character = source[index];
+            if (character === "\\" && index + 1 < source.length) {
+                cell += character + source[index + 1];
+                index++;
+                continue;
+            }
+            if (character === "`" && !mathDelimiter) {
+                inCode = !inCode;
+                cell += character;
+                continue;
+            }
+            if (character === "$" && !inCode) {
+                const delimiter = source[index + 1] === "$" ? "$$" : "$";
+                if (!mathDelimiter) mathDelimiter = delimiter;
+                else if (mathDelimiter === delimiter) mathDelimiter = "";
+                cell += delimiter;
+                if (delimiter === "$$") index++;
+                continue;
+            }
+            if (character === "|" && !inCode && !mathDelimiter) {
+                cells.push(cell.trim());
+                cell = "";
+                continue;
+            }
+            cell += character;
+        }
+        cells.push(cell.trim());
+        return cells;
     }
 
     function isTableSeparator(line) {
@@ -572,6 +607,7 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
             if (list) {
                 const ordered = /^\d/.test(list[1]);
                 const tag = ordered ? "ol" : "ul";
+                const start = ordered ? Number.parseInt(list[1], 10) : 1;
                 const items = [];
                 while (index < lines.length) {
                     const item = lines[index].match(/^\s{0,3}([-+*]|\d+[.)])\s+(.+)$/);
@@ -579,7 +615,8 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
                     items.push(`<li>${renderInlineMarkdown(item[2])}</li>`);
                     index++;
                 }
-                output.push(`<${tag}>${items.join("")}</${tag}>`);
+                const startAttribute = ordered && start !== 1 ? ` start="${start}"` : "";
+                output.push(`<${tag}${startAttribute}>${items.join("")}</${tag}>`);
                 continue;
             }
 
@@ -2066,5 +2103,6 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
         await historyStore.flush();
     }
 
-    return { startup, onMainWindowLoad, onMainWindowUnload, shutdown };
+    const testAPI = globalThis.ZCC_TESTING ? { renderMarkdown, splitTableRow } : null;
+    return { startup, onMainWindowLoad, onMainWindowUnload, shutdown, ...(testAPI ? { __test: testAPI } : {}) };
 })();
