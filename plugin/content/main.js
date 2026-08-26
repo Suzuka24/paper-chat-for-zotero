@@ -2035,6 +2035,7 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
             sidenav: {
                 icon: rootURI + "content/codex.svg",
                 l10nID: "zcc-section-sidenav",
+                orderable: false,
             },
             onItemChange({ item, setEnabled }) {
                 const supported = Boolean(item?.isRegularItem?.() || item?.isAttachment?.());

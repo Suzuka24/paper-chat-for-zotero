@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Paper Chat for Zotero",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "Chat with papers in Zotero by reusing your local Codex sign-in.",
   "author": "Suzuka24",
   "applications": {

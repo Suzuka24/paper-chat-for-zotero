@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here.
 
+## [0.6.4] - 2026-08-26
+
+### Changed
+
+- Kept the Paper Chat item-pane icon after all orderable sidebar section icons.
+
 ## [0.6.3] - 2026-08-26
 
 ### Fixed

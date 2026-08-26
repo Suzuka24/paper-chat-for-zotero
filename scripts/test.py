@@ -42,6 +42,10 @@ def build() -> str:
 
 
 def main() -> int:
+    main_script = (PROJECT_ROOT / "plugin" / "content" / "main.js").read_text(encoding="utf-8")
+    if not re.search(r"sidenav:\s*\{[^}]*orderable:\s*false", main_script, re.DOTALL):
+        raise RuntimeError("The Paper Chat sidenav button must remain fixed after orderable panes.")
+
     for script in ("plugin/content/main.js", "plugin/content/preferences.js"):
         run("node", "--check", script)
 
