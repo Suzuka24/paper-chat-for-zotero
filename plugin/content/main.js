@@ -12,6 +12,7 @@ var ZoteroCodexChatPlugin = (() => {
     const panels = new Map();
     const pendingSelections = new Map();
     const itemPaneCompatibilityPatches = new Map();
+    const itemPaneOrderPatches = new Map();
     let registeredPaneID = null;
     let registeredPreferencePaneID = null;
     let pluginRootURI = "";
@@ -316,6 +317,11 @@ var ZoteroCodexChatPlugin = (() => {
 
     function setPref(name, value) {
         Zotero.Prefs.set(PREF_PREFIX + name, value, true);
+    }
+
+    function normalizedFontSize(value = pref("fontSize", 13)) {
+        const size = Number(value);
+        return Number.isFinite(size) ? Math.max(11, Math.min(20, Math.round(size))) : 13;
     }
 
     async function loadInstalledBridgeToken() {
@@ -1023,6 +1029,45 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
         itemPaneCompatibilityPatches.clear();
     }
 
+    function movePaperChatSectionLast(itemDetails) {
+        const panes = itemDetails?.getPanes?.() || [];
+        const pane = panes.find(candidate => {
+            const paneID = candidate?.dataset?.pane || "";
+            return paneID === registeredPaneID || paneID === PANE_ID || paneID.endsWith(`-${PANE_ID}`);
+        });
+        const parent = pane?.parentElement;
+        if (!parent?.appendChild || parent.lastElementChild === pane) return false;
+        parent.appendChild(pane);
+        return true;
+    }
+
+    async function applyItemPaneOrder(win) {
+        if (!win?.customElements) return;
+        await win.customElements.whenDefined("item-details");
+        const ItemDetails = win.customElements.get("item-details");
+        const prototype = ItemDetails?.prototype;
+        if (!prototype || itemPaneOrderPatches.has(prototype)) return;
+        const originalInitPaneOrder = prototype.initPaneOrder;
+        if (typeof originalInitPaneOrder !== "function") return;
+
+        const patchedInitPaneOrder = function (...args) {
+            const result = originalInitPaneOrder.apply(this, args);
+            movePaperChatSectionLast(this);
+            return result;
+        };
+        prototype.initPaneOrder = patchedInitPaneOrder;
+        itemPaneOrderPatches.set(prototype, { originalInitPaneOrder, patchedInitPaneOrder });
+    }
+
+    function restoreItemPaneOrder() {
+        for (const [prototype, patch] of itemPaneOrderPatches) {
+            if (prototype.initPaneOrder === patch.patchedInitPaneOrder) {
+                prototype.initPaneOrder = patch.originalInitPaneOrder;
+            }
+        }
+        itemPaneOrderPatches.clear();
+    }
+
     class ChatPanel {
         constructor(win, container) {
             this.win = win;
@@ -1041,6 +1086,7 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
             this.resizeMove = null;
             this.resizeEnd = null;
             this.mathResizeObserver = null;
+            this.fontSizeObserverID = null;
             this.build();
         }
 
@@ -1054,6 +1100,7 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
             this.root = html(this.doc, "section", "zcc-panel");
             this.root.setAttribute("role", "region");
             this.root.setAttribute("aria-label", ui("pluginName", "Paper Chat for Zotero"));
+            this.applyFontSize();
             const savedHeight = Number(pref("panelHeight", 900));
             this.setPanelHeight(Number.isFinite(savedHeight) ? savedHeight : 900, false);
 
@@ -1186,10 +1233,15 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
             });
             this.root.append(controls, history, context, this.messages, this.resizeHandle, compose);
             this.container.append(this.katexStyle, this.style, this.root);
+            this.fontSizeObserverID = Zotero.Prefs.registerObserver(PREF_PREFIX + "fontSize", () => this.applyFontSize(), true);
             if (typeof this.win.ResizeObserver === "function") {
                 this.mathResizeObserver = new this.win.ResizeObserver(() => refreshInlineMathOverflow(this.messages));
                 this.mathResizeObserver.observe(this.messages);
             }
+        }
+
+        applyFontSize() {
+            this.root?.style.setProperty("font-size", `${normalizedFontSize()}px`);
         }
 
         setPanelHeight(height, persist) {
@@ -1886,6 +1938,7 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
                         message: this.buildPrompt(question),
                         model: this.model.value || null,
                         effort: this.effort.value,
+                        webSearchMode: pref("webSearchMode", "live"),
                         cwd,
                         threadName,
                         paperPath: this.paper.path,
@@ -1978,6 +2031,10 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
             this.abortController?.abort();
             this.finishPanelResize();
             this.mathResizeObserver?.disconnect();
+            if (this.fontSizeObserverID !== null) {
+                Zotero.Prefs.unregisterObserver(this.fontSizeObserverID);
+                this.fontSizeObserverID = null;
+            }
             this.root?.remove();
             this.style?.remove();
             this.katexStyle?.remove();
@@ -2007,6 +2064,7 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
         for (const win of Zotero.getMainWindows()) {
             try {
                 await applyItemPaneCompatibility(win);
+                await applyItemPaneOrder(win);
             } catch (error) {
                 Zotero.logError(error);
             }
@@ -2044,6 +2102,9 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
             onRender({ item, setSectionSummary }) {
                 setSectionSummary(item?.getField?.("title") || "");
             },
+            onInit({ body }) {
+                movePaperChatSectionLast(body?.closest?.("item-details"));
+            },
             async onAsyncRender({ body, doc, paneID, tabType, item }) {
                 normalizeSidenavButton(doc, paneID);
                 const liveBody = resolveLiveSectionBody({ body, doc, paneID, tabType, item });
@@ -2073,6 +2134,7 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
 
     async function onMainWindowLoad(win) {
         await applyItemPaneCompatibility(win);
+        await applyItemPaneOrder(win);
         cleanupLegacyUI(win);
     }
 
@@ -2097,6 +2159,7 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
             registeredPreferencePaneID = null;
         }
         restoreItemPaneCompatibility();
+        restoreItemPaneOrder();
         cleanupLegacyUI();
         pendingSelections.clear();
         Zotero.Reader._unregisterEventListenerByPluginID?.(PLUGIN_ID);
@@ -2104,6 +2167,6 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
         await historyStore.flush();
     }
 
-    const testAPI = globalThis.ZCC_TESTING ? { renderMarkdown, splitTableRow } : null;
+    const testAPI = globalThis.ZCC_TESTING ? { renderMarkdown, splitTableRow, normalizedFontSize, movePaperChatSectionLast } : null;
     return { startup, onMainWindowLoad, onMainWindowUnload, shutdown, ...(testAPI ? { __test: testAPI } : {}) };
 })();

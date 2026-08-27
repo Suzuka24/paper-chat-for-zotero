@@ -25,7 +25,7 @@ Set-ExecutionPolicy -Scope Process Bypass
 python3 Install-macOS.py
 ```
 
-The installer downloads a pinned OpenAI Codex App Server release, requires its published SHA-256 digest to match, installs the bridge under `%LOCALAPPDATA%\PaperChatForZotero` on Windows or `~/Library/Application Support/PaperChatForZotero` on macOS, creates a per-installation token, configures login startup, and builds `dist/paper-chat-for-zotero.xpi`.
+The installer downloads pinned OpenAI Codex App Server and Code Mode Host releases, requires their published SHA-256 digests to match, installs the bridge under `%LOCALAPPDATA%\PaperChatForZotero` on Windows or `~/Library/Application Support/PaperChatForZotero` on macOS, creates a per-installation token, configures login startup, and builds `dist/paper-chat-for-zotero.xpi`.
 
 In Zotero, choose `Tools → Plugins → gear menu → Install Plugin From File`, select the XPI, and fully restart Zotero. Use `Install.ps1 -NoAutoStart` on Windows or `python3 Install-macOS.py --no-auto-start` on macOS to skip login startup.
 

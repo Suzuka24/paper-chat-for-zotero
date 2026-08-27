@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented here.
 
+## [0.6.5] - 2026-08-27
+
+### Added
+
+- Added configurable live, cached, or disabled web search, with live search enabled by default.
+- Added an 11–20 px interface font-size control that updates open Paper Chat panels immediately.
+
+### Fixed
+
+- Kept the Paper Chat content section below other item-pane sections, matching its fixed sidebar icon position.
+
 ## [0.6.4] - 2026-08-26
 
 ### Changed

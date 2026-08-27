@@ -15,6 +15,6 @@ Include the affected version, Zotero version, operating system, impact, reproduc
 - The bridge binds to loopback and rejects requests without a per-installation token.
 - Codex turns run with `approvalPolicy: never` and a read-only sandbox.
 - Interactive App Server tool requests are rejected.
-- The installer downloads a pinned official App Server release and requires SHA-256 verification.
+- The installer downloads pinned official App Server and Code Mode Host releases and requires SHA-256 verification.
 
 These controls reduce risk but do not make untrusted attachments or prompts harmless. Review sensitive papers and workspace policies before sending content for model processing.

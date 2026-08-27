@@ -5,4 +5,6 @@ pref("extensions.zotero-codex-chat.effort", "medium");
 pref("extensions.zotero-codex-chat.generalPrompt", "");
 pref("extensions.zotero-codex-chat.defaultLanguage", "zh-CN");
 pref("extensions.zotero-codex-chat.tone", "academic");
+pref("extensions.zotero-codex-chat.fontSize", 13);
+pref("extensions.zotero-codex-chat.webSearchMode", "live");
 pref("extensions.zotero-codex-chat.panelHeight", 900);

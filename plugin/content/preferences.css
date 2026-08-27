@@ -31,6 +31,13 @@
     line-height: 1.55;
 }
 
+.zcc-pref-field-help {
+    margin: 5px 0 0;
+    color: var(--fill-secondary, #64748b);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
 .zcc-pref-label {
     padding-top: 7px;
     font-weight: 600;
@@ -47,6 +54,24 @@
     color: inherit;
     background: var(--material-background, #fff);
     font: inherit;
+}
+
+.zcc-pref-font-size-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 32px;
+}
+
+#zcc-pref-font-size {
+    flex: 1;
+    min-width: 120px;
+}
+
+#zcc-pref-font-size-value {
+    min-width: 42px;
+    color: var(--fill-secondary, #64748b);
+    font-variant-numeric: tabular-nums;
 }
 
 .zcc-pref-prompt {

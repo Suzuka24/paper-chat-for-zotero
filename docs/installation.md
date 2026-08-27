@@ -27,8 +27,8 @@ python3 Install-macOS.py
 
 安装器会：
 
-- 下载固定且经过测试的 OpenAI 官方 Codex App Server 版本；
-- 强制校验 GitHub Release 提供的 SHA-256；
+- 下载固定且经过测试的 OpenAI 官方 Codex App Server 与 Code Mode Host 版本；
+- 强制校验两个组件在 GitHub Release 中提供的 SHA-256；
 - 将桥接服务安装到 Windows 的 `%LOCALAPPDATA%\PaperChatForZotero` 或 macOS 的 `~/Library/Application Support/PaperChatForZotero`；
 - 生成独立的 256-bit 随机本地令牌；
 - 创建 Windows 登录自启动快捷方式或 macOS 用户级 `launchd` 服务；

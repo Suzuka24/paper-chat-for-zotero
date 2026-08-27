@@ -20,6 +20,7 @@ from typing import Any
 
 LOG = logging.getLogger("zotero-codex-bridge")
 SESSION_SOURCE = "app-server"
+WEB_SEARCH_MODES = {"live", "cached", "disabled"}
 
 
 class BridgeError(RuntimeError):
@@ -198,14 +199,20 @@ class CodexAppServer:
             "model/list", {"limit": 100, "includeHidden": False}, timeout=30
         )
 
+    @staticmethod
+    def web_search_mode(body: dict[str, Any]) -> str:
+        mode = str(body.get("webSearchMode") or "live").strip().lower()
+        return mode if mode in WEB_SEARCH_MODES else "live"
+
     def _ensure_thread(self, body: dict[str, Any]) -> str:
         thread_id = body.get("threadId")
         model = body.get("model") or None
         cwd = body.get("cwd") or str(Path.home())
+        config = {"web_search": self.web_search_mode(body)}
         with self._state_lock:
             already_loaded = bool(thread_id and thread_id in self._loaded_threads)
         if thread_id and not already_loaded:
-            params: dict[str, Any] = {"threadId": thread_id}
+            params: dict[str, Any] = {"threadId": thread_id, "config": config}
             if model:
                 params["model"] = model
             if cwd:
@@ -230,6 +237,7 @@ class CodexAppServer:
             "approvalPolicy": "never",
             "personality": "friendly",
             "serviceName": "paper_chat_for_zotero",
+            "config": config,
         }
         if model:
             params["model"] = model

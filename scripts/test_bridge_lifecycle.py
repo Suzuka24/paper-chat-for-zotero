@@ -60,6 +60,13 @@ class ThreadLifecycleTests(unittest.TestCase):
     def test_new_threads_use_non_interactive_app_server_source(self) -> None:
         self.assertEqual(SERVER.SESSION_SOURCE, "app-server")
 
+    def test_web_search_mode_defaults_to_live_and_rejects_unknown_values(self) -> None:
+        app = FakeApp()
+        self.assertEqual(app.web_search_mode({}), "live")
+        self.assertEqual(app.web_search_mode({"webSearchMode": "cached"}), "cached")
+        self.assertEqual(app.web_search_mode({"webSearchMode": "disabled"}), "disabled")
+        self.assertEqual(app.web_search_mode({"webSearchMode": "unexpected"}), "live")
+
     def test_archived_thread_is_unarchived_before_resume(self) -> None:
         app = FakeApp({"thread-1"})
         result = app._ensure_thread({"threadId": "thread-1", "cwd": "/tmp"})
@@ -68,6 +75,16 @@ class ThreadLifecycleTests(unittest.TestCase):
             [method for method, _params in app.calls],
             ["thread/resume", "thread/unarchive", "thread/resume"],
         )
+        resume_params = [params for method, params in app.calls if method == "thread/resume"]
+        self.assertTrue(all(params["config"] == {"web_search": "live"} for params in resume_params))
+
+    def test_resume_applies_selected_web_search_mode(self) -> None:
+        app = FakeApp()
+        result = app._ensure_thread(
+            {"threadId": "thread-1", "cwd": "/tmp", "webSearchMode": "disabled"}
+        )
+        self.assertEqual(result, "thread-1")
+        self.assertEqual(app.calls[0][1]["config"], {"web_search": "disabled"})
 
     def test_completed_turn_is_archived_and_unloaded(self) -> None:
         app = FakeApp()

@@ -22,7 +22,28 @@ const context = vm.createContext({
 });
 vm.runInContext(source, context, { filename: "plugin/content/main.js" });
 
-const { renderMarkdown, splitTableRow } = context.ZoteroCodexChatPlugin.__test;
+const { renderMarkdown, splitTableRow, normalizedFontSize, movePaperChatSectionLast } = context.ZoteroCodexChatPlugin.__test;
+
+assert.equal(normalizedFontSize("16"), 16);
+assert.equal(normalizedFontSize(8), 11);
+assert.equal(normalizedFontSize(24), 20);
+assert.equal(normalizedFontSize("invalid"), 13);
+
+const chatPane = {};
+const otherPane = {};
+const paneParent = {
+    lastElementChild: otherPane,
+    appendChild(pane) {
+        this.lastElementChild = pane;
+    },
+};
+chatPane.parentElement = paneParent;
+chatPane.dataset = { pane: "paper-chat-for-zotero\\@suzuka24\\.github\\.io-zotero-codex-chat-section" };
+otherPane.dataset = { pane: "zoteropdftranslate\\@euclpts\\.com-translate" };
+const itemDetails = { getPanes: () => [chatPane, otherPane] };
+assert.equal(movePaperChatSectionLast(itemDetails), true);
+assert.equal(paneParent.lastElementChild, chatPane);
+assert.equal(movePaperChatSectionLast(itemDetails), false);
 
 assert.deepEqual(
     Array.from(splitTableRow("| Method | Solution | Scope |")),

@@ -23,6 +23,22 @@
       <html:option value="critical">Critical analysis</html:option>
     </html:select>
 
+    <html:label id="zcc-pref-web-search-label" class="zcc-pref-label" for="zcc-pref-web-search">Web search</html:label>
+    <html:div>
+      <html:select id="zcc-pref-web-search" class="zcc-pref-control">
+        <html:option value="live">Live web search</html:option>
+        <html:option value="cached">Cached search index</html:option>
+        <html:option value="disabled">Disabled</html:option>
+      </html:select>
+      <html:p id="zcc-pref-web-search-help" class="zcc-pref-field-help">Allows Codex to retrieve sources outside the current paper. Local files remain read-only.</html:p>
+    </html:div>
+
+    <html:label id="zcc-pref-font-size-label" class="zcc-pref-label" for="zcc-pref-font-size">Interface font size</html:label>
+    <html:div class="zcc-pref-font-size-row">
+      <html:input id="zcc-pref-font-size" type="range" min="11" max="20" step="1" value="13" />
+      <html:output id="zcc-pref-font-size-value" for="zcc-pref-font-size">13 px</html:output>
+    </html:div>
+
     <html:label id="zcc-pref-prompt-label" class="zcc-pref-label" for="zcc-pref-prompt">General prompt / persistent rules</html:label>
     <html:textarea id="zcc-pref-prompt" class="zcc-pref-prompt" placeholder="For example: start with a one-sentence conclusion; cite page numbers when comparing methods; clearly mark uncertainty."></html:textarea>
     <html:p id="zcc-pref-help" class="zcc-pref-help">Use this for long-term preferences. The current paper, read-only safety rules, and your current question are still added automatically.</html:p>

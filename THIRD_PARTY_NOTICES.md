@@ -10,4 +10,4 @@ This project redistributes KaTeX JavaScript, CSS, and fonts for local mathematic
 
 ## OpenAI Codex App Server
 
-The installer downloads, verifies, and locally installs an official Codex App Server binary from the `openai/codex` GitHub releases. The binary is not stored in this repository or bundled in the XPI. OpenAI Codex is available under the Apache License 2.0; see <https://github.com/openai/codex>.
+The installer downloads, verifies, and locally installs official Codex App Server and Code Mode Host binaries from the `openai/codex` GitHub releases. The binaries are not stored in this repository or bundled in the XPI. OpenAI Codex is available under the Apache License 2.0; see <https://github.com/openai/codex>.

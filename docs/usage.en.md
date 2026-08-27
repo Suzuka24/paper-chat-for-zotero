@@ -31,7 +31,7 @@ Only items explicitly selected or attached are added beyond the current paper.
 
 ## Preferences
 
-Open `Edit → Settings → Paper Chat for Zotero` to configure the default answer language, response style, and a persistent general prompt. Changes apply from the next question.
+Open `Edit → Settings → Paper Chat for Zotero` to configure the default answer language, response style, interface font size, persistent general prompt, and web-search mode. **Live web search** is the default and can retrieve sources beyond the current paper. **Cached search index only** avoids live page retrieval, while **Disable web search** removes the search tool. Changes apply from the next question, and local files remain read-only in every mode.
 
 ## Authentication and bridge
 

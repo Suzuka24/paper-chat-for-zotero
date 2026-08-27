@@ -45,6 +45,12 @@ def main() -> int:
     main_script = (PROJECT_ROOT / "plugin" / "content" / "main.js").read_text(encoding="utf-8")
     if not re.search(r"sidenav:\s*\{[^}]*orderable:\s*false", main_script, re.DOTALL):
         raise RuntimeError("The Paper Chat sidenav button must remain fixed after orderable panes.")
+    if "applyItemPaneOrder" not in main_script or "movePaperChatSectionLast" not in main_script:
+        raise RuntimeError("The Paper Chat content section must remain last in the item pane.")
+    if not re.search(r'registerObserver\(PREF_PREFIX \+ "fontSize",[^;]+, true\)', main_script):
+        raise RuntimeError("The Paper Chat font-size preference must be observed by open panels.")
+    if 'webSearchMode: pref("webSearchMode", "live")' not in main_script:
+        raise RuntimeError("The selected web-search mode must be sent to the local bridge.")
 
     for script in ("plugin/content/main.js", "plugin/content/preferences.js"):
         run("node", "--check", script)
@@ -86,7 +92,7 @@ def main() -> int:
         missing = sorted(required - entries)
         if missing:
             raise RuntimeError(f"The XPI is missing: {', '.join(missing)}")
-        forbidden = re.compile(r"(^|/)(token\.txt|bridge\.log|bridge\.pid|codex-app-server(?:\.exe)?)$")
+        forbidden = re.compile(r"(^|/)(token\.txt|bridge\.log|bridge\.pid|codex-(?:app-server|code-mode-host)(?:\.exe)?)$")
         leaked = sorted(entry for entry in entries if forbidden.search(entry))
         if leaked:
             raise RuntimeError(f"The XPI contains forbidden local files: {', '.join(leaked)}")

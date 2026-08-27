@@ -12,6 +12,7 @@ Chat with the paper currently open in Zotero, directly from its native sidebar. 
 
 - Uses the current PDF, selections, annotations, Zotero notes, and local attachments as context.
 - Supports account-aware models, reasoning effort, streaming responses, and persistent conversations.
+- Provides live web search for sources beyond the paper, with cached and disabled modes available in preferences.
 - Keeps plugin-managed tasks out of Codex **Recent** by archiving completed conversations while retaining resumable context.
 - Renders Markdown, tables, code, and KaTeX math, with clickable PDF page references.
 - Copies or saves individual messages and complete conversations to Zotero notes.

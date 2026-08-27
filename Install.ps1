@@ -10,6 +10,7 @@ $sourceBridge = Join-Path $projectRoot 'bridge'
 $installRoot = Join-Path $env:LOCALAPPDATA 'PaperChatForZotero'
 $legacyRoot = Join-Path $env:LOCALAPPDATA 'ZoteroCodexChat'
 $appServer = Join-Path $installRoot 'codex-app-server.exe'
+$codeModeHost = Join-Path $installRoot 'codex-code-mode-host.exe'
 $startupFolder = [Environment]::GetFolderPath('Startup')
 $startupLink = Join-Path $startupFolder 'Paper Chat for Zotero Bridge.lnk'
 $legacyStartupLink = Join-Path $startupFolder 'Zotero Codex Chat Bridge.lnk'
@@ -51,37 +52,46 @@ if ($token -notmatch '^[a-fA-F0-9]{64}$') {
 [IO.File]::WriteAllText($tokenFile, $token, [Text.UTF8Encoding]::new($false))
 Write-Output 'Created a per-installation loopback bridge token.'
 
-if (-not (Test-Path -LiteralPath $appServer -PathType Leaf)) {
+if (-not (Test-Path -LiteralPath $appServer -PathType Leaf) -or -not (Test-Path -LiteralPath $codeModeHost -PathType Leaf)) {
     if ($SkipDownload) {
-        throw 'Codex App Server is not installed; -SkipDownload cannot be used.'
+        throw 'Codex App Server or Code Mode Host is not installed; -SkipDownload cannot be used.'
     }
-    Write-Output "Downloading Codex App Server $CodexVersion from the official OpenAI GitHub release (about 230 MB)..."
     $release = Invoke-RestMethod -Uri "https://api.github.com/repos/openai/codex/releases/tags/$CodexVersion" -Headers @{
         'User-Agent' = 'Paper-Chat-for-Zotero-Installer'
     }
-    $assetName = if ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -eq 'Arm64') {
-        'codex-app-server-aarch64-pc-windows-msvc.exe'
+    $architecture = if ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -eq 'Arm64') {
+        'aarch64'
     } else {
-        'codex-app-server-x86_64-pc-windows-msvc.exe'
+        'x86_64'
     }
-    $asset = $release.assets | Where-Object { $_.name -eq $assetName } | Select-Object -First 1
-    if (-not $asset) {
-        throw "Asset not found in the OpenAI release: $assetName"
+    foreach ($component in @(
+        @{ Name = 'codex-app-server'; Destination = $appServer },
+        @{ Name = 'codex-code-mode-host'; Destination = $codeModeHost }
+    )) {
+        if (Test-Path -LiteralPath $component.Destination -PathType Leaf) {
+            continue
+        }
+        $assetName = "$($component.Name)-$architecture-pc-windows-msvc.exe"
+        $asset = $release.assets | Where-Object { $_.name -eq $assetName } | Select-Object -First 1
+        if (-not $asset) {
+            throw "Asset not found in the OpenAI release: $assetName"
+        }
+        Write-Output "Downloading $($component.Name) $CodexVersion from the official OpenAI GitHub release..."
+        $temporaryDownload = "$($component.Destination).download"
+        Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $temporaryDownload
+        if ($asset.digest -notmatch '^sha256:([a-fA-F0-9]{64})$') {
+            [IO.File]::Delete($temporaryDownload)
+            throw 'The official release did not provide a valid SHA-256 digest.'
+        }
+        $expectedHash = $Matches[1].ToLowerInvariant()
+        $actualHash = (Get-FileHash -LiteralPath $temporaryDownload -Algorithm SHA256).Hash.ToLowerInvariant()
+        if ($actualHash -ne $expectedHash) {
+            [IO.File]::Delete($temporaryDownload)
+            throw "$($component.Name) SHA-256 verification failed."
+        }
+        Move-Item -LiteralPath $temporaryDownload -Destination $component.Destination -Force
+        Write-Output "Installed $($component.Name) $($release.tag_name)."
     }
-    $temporaryDownload = Join-Path $installRoot 'codex-app-server.download'
-    Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $temporaryDownload
-    if ($asset.digest -notmatch '^sha256:([a-fA-F0-9]{64})$') {
-        [IO.File]::Delete($temporaryDownload)
-        throw 'The official release did not provide a valid SHA-256 digest.'
-    }
-    $expectedHash = $Matches[1].ToLowerInvariant()
-    $actualHash = (Get-FileHash -LiteralPath $temporaryDownload -Algorithm SHA256).Hash.ToLowerInvariant()
-    if ($actualHash -ne $expectedHash) {
-        [IO.File]::Delete($temporaryDownload)
-        throw 'Codex App Server SHA-256 verification failed.'
-    }
-    Move-Item -LiteralPath $temporaryDownload -Destination $appServer -Force
-    Write-Output "Installed Codex App Server $($release.tag_name)."
 }
 
 & (Join-Path $projectRoot 'Build.ps1')

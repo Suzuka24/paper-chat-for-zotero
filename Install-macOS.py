@@ -82,7 +82,7 @@ def ensure_token(token_file: Path) -> None:
     token_file.chmod(0o600)
 
 
-def app_server_asset_name() -> str:
+def codex_target() -> str:
     machine = platform.machine().lower()
     if machine in {"arm64", "aarch64"}:
         architecture = "aarch64"
@@ -90,7 +90,11 @@ def app_server_asset_name() -> str:
         architecture = "x86_64"
     else:
         raise RuntimeError(f"Unsupported macOS architecture: {machine}")
-    return f"codex-app-server-{architecture}-apple-darwin.tar.gz"
+    return f"{architecture}-apple-darwin"
+
+
+def component_asset_name(component: str) -> str:
+    return f"{component}-{codex_target()}.tar.gz"
 
 
 def release_asset(version: str, asset_name: str) -> tuple[str, str]:
@@ -126,10 +130,10 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def install_app_server(version: str, destination: Path) -> None:
-    asset_name = app_server_asset_name()
+def install_codex_component(version: str, component: str, destination: Path) -> None:
+    asset_name = component_asset_name(component)
     url, expected_hash = release_asset(version, asset_name)
-    print(f"Downloading Codex App Server {version} ({asset_name})...")
+    print(f"Downloading {component} {version} ({asset_name})...")
     with tempfile.TemporaryDirectory(prefix="paper-chat-codex-") as temporary_directory:
         archive_path = Path(temporary_directory) / asset_name
         download(url, archive_path)
@@ -140,19 +144,19 @@ def install_app_server(version: str, destination: Path) -> None:
             members = [
                 member
                 for member in archive.getmembers()
-                if member.isfile() and Path(member.name).name.startswith("codex-app-server")
+                if member.isfile() and Path(member.name).name.startswith(component)
             ]
             if len(members) != 1:
-                raise RuntimeError("The Codex App Server archive has an unexpected layout.")
+                raise RuntimeError(f"The {component} archive has an unexpected layout.")
             extracted = archive.extractfile(members[0])
             if extracted is None:
-                raise RuntimeError("Unable to extract the Codex App Server binary.")
-            temporary_binary = Path(temporary_directory) / "codex-app-server"
+                raise RuntimeError(f"Unable to extract the {component} binary.")
+            temporary_binary = Path(temporary_directory) / component
             with temporary_binary.open("wb") as output:
                 shutil.copyfileobj(extracted, output)
             temporary_binary.chmod(0o755)
             os.replace(temporary_binary, destination)
-    print(f"Installed Codex App Server {version}.")
+    print(f"Installed {component} {version}.")
 
 
 def write_launch_agent(
@@ -216,6 +220,7 @@ def main() -> int:
     install_root = Path.home() / "Library" / "Application Support" / "PaperChatForZotero"
     launch_agent = Path.home() / "Library" / "LaunchAgents" / f"{LAUNCH_LABEL}.plist"
     app_server = install_root / "codex-app-server"
+    code_mode_host = install_root / "codex-code-mode-host"
 
     stop_existing_bridge(launch_agent, install_root / "Stop-Bridge.sh")
     copy_bridge(project_root / "bridge", install_root)
@@ -226,8 +231,13 @@ def main() -> int:
     if not app_server.is_file():
         if args.skip_download:
             raise RuntimeError("Codex App Server is not installed; --skip-download cannot be used.")
-        install_app_server(args.codex_version, app_server)
-    app_server.chmod(app_server.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+        install_codex_component(args.codex_version, "codex-app-server", app_server)
+    if not code_mode_host.is_file():
+        if args.skip_download:
+            raise RuntimeError("Codex Code Mode Host is not installed; --skip-download cannot be used.")
+        install_codex_component(args.codex_version, "codex-code-mode-host", code_mode_host)
+    for executable in (app_server, code_mode_host):
+        executable.chmod(executable.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
     if args.no_auto_start:
         launch_agent.unlink(missing_ok=True)
