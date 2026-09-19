@@ -452,6 +452,7 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
 .zcc-note-context-row{display:grid;grid-template-columns:minmax(0,1fr) max-content;gap:4px;margin-top:4px;min-width:0}.zcc-note-context-row .zcc-note-picker{margin-top:0}.zcc-note-context-row>*,.zcc-note-save>*{box-sizing:border-box;max-width:100%;min-width:0;height:30px;min-height:30px;margin:0}.zcc-note-context-row>.zcc-button{display:inline-flex;align-items:center;justify-content:center;padding:0 7px}
 .zcc-controls{border-bottom:0}.zcc-controls,.zcc-history{align-items:stretch}.zcc-controls>*,.zcc-history>*{box-sizing:border-box;max-width:100%;min-width:0;height:32px;min-height:32px;margin:0;align-self:stretch}.zcc-controls>.zcc-button,.zcc-history>.zcc-button{display:inline-flex;align-items:center;justify-content:center;padding-top:0;padding-bottom:0;line-height:1}
 .zcc-messages{box-sizing:border-box;contain:inline-size;flex:1;width:100%;max-width:100%;min-width:0;min-height:210px;overflow-x:hidden;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:9px}.zcc-turn{box-sizing:border-box;display:flex;flex-direction:column;width:100%;max-width:100%;min-width:0}.zcc-turn-user{align-items:flex-end}.zcc-turn-assistant,.zcc-turn-error{align-items:stretch}.zcc-message{box-sizing:border-box;width:auto;max-width:100%;min-width:0;padding:8px 10px;border-radius:9px;overflow-wrap:anywhere;word-break:break-word;user-select:text}.zcc-turn-user .zcc-message{width:fit-content;align-self:flex-end}.zcc-turn-assistant .zcc-message,.zcc-turn-error .zcc-message{width:100%;align-self:stretch}.zcc-user{background:#2563eb;color:#fff;white-space:pre-wrap}.zcc-assistant{background:#fff;border:1px solid #dbe2ea;overflow:hidden}.zcc-error{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;white-space:pre-wrap}.zcc-message-tools{display:flex;gap:2px;margin-top:3px;opacity:.68;transition:opacity .15s}.zcc-turn:hover .zcc-message-tools,.zcc-message-tools:focus-within{opacity:1}.zcc-icon-button{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;padding:4px;border:0;border-radius:5px;background:transparent;color:#64748b;cursor:pointer}.zcc-icon-button:hover{background:#e2e8f0;color:#0f172a}.zcc-icon-button:disabled{opacity:.35;cursor:default}.zcc-icon-button svg,.zcc-icon-label svg{display:block;width:16px;height:16px;flex:0 0 auto}
+.zcc-assistant.zcc-streaming{white-space:pre-wrap}
 .zcc-assistant>:first-child{margin-top:0}.zcc-assistant>:last-child{margin-bottom:0}.zcc-assistant p{max-width:100%;margin:.45em 0;white-space:normal;overflow-wrap:anywhere;word-break:break-word}.zcc-assistant h1,.zcc-assistant h2,.zcc-assistant h3,.zcc-assistant h4,.zcc-assistant h5,.zcc-assistant h6{max-width:100%;line-height:1.3;margin:.8em 0 .35em;font-weight:700;white-space:normal;overflow-wrap:anywhere}.zcc-assistant h1{font-size:1.28em}.zcc-assistant h2{font-size:1.2em}.zcc-assistant h3{font-size:1.12em}.zcc-assistant ul,.zcc-assistant ol{box-sizing:border-box;max-width:100%;margin:.4em 0;padding-left:1.6em}.zcc-assistant li{min-width:0;margin:.18em 0;white-space:normal;overflow-wrap:anywhere;word-break:break-word}.zcc-assistant blockquote{box-sizing:border-box;width:100%;max-width:100%;margin:.55em 0;padding:.15em .75em;border-left:3px solid #94a3b8;color:#475569;white-space:normal;overflow-wrap:anywhere;word-break:break-word}.zcc-assistant code{max-width:100%;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#e2e8f0;border-radius:4px;padding:.08em .3em;font-size:.92em;overflow-wrap:anywhere;word-break:break-word}.zcc-assistant pre{box-sizing:border-box;width:100%;max-width:100%;margin:.6em 0;padding:9px;overflow-x:auto;border-radius:7px;background:#0f172a;color:#e2e8f0;white-space:pre-wrap;overflow-wrap:anywhere}.zcc-assistant pre code{padding:0;background:transparent;color:inherit}.zcc-assistant table{box-sizing:border-box;width:100%;max-width:100%;table-layout:fixed;margin:.55em 0;border-collapse:collapse;font-size:.95em}.zcc-assistant th,.zcc-assistant td{min-width:0;padding:4px 6px;border:1px solid #cbd5e1;text-align:left;vertical-align:top;overflow-wrap:anywhere;word-break:break-word}.zcc-assistant th{background:#f1f5f9}.zcc-assistant a{color:#2563eb;text-decoration:underline;overflow-wrap:anywhere;word-break:break-word}.zcc-assistant hr{border:0;border-top:1px solid #cbd5e1;margin:.8em 0}.zcc-math-inline{display:inline-block;max-width:none;overflow:visible;vertical-align:middle}.zcc-math-inline-overflow{max-width:100%;overflow-x:auto;overflow-y:hidden}.zcc-math-display{box-sizing:border-box;display:block;width:100%;max-width:100%;margin:.55em 0;overflow-x:auto;overflow-y:hidden;text-align:center}.zcc-math-display>.katex-display{min-width:max-content;margin:0}.zcc-math-pipeline{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.35em .5em;overflow-x:hidden}.zcc-math-pipeline-link{display:inline-flex;align-items:center;gap:.5em;max-width:100%;min-width:0}.zcc-math-step{display:inline-block;max-width:100%;min-width:0;overflow-x:auto;overflow-y:hidden}.zcc-math-arrow{flex:0 0 auto}.zcc-math-error{color:#b91c1c;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap}
 .zcc-resize-handle{box-sizing:border-box;display:flex;align-items:center;justify-content:center;flex:0 0 11px;height:11px;border-top:1px solid #e2e8f0;background:#f8fafc;cursor:ns-resize;touch-action:none}.zcc-resize-handle::before{content:"";display:block;width:42px;height:3px;border-radius:999px;background:#94a3b8;opacity:.7}.zcc-resize-handle:hover::before,.zcc-resize-handle:focus::before{background:#2563eb;opacity:1}.zcc-compose{box-sizing:border-box;flex:0 0 auto;width:100%;min-width:0;padding:9px 10px 11px;background:#fff;overflow:visible}.zcc-textarea{box-sizing:border-box;width:100%;max-width:100%;min-width:0;min-height:68px;max-height:170px;resize:vertical;border:1px solid #cbd5e1;border-radius:8px;padding:8px;font:inherit;color:#111827;background:#fff}.zcc-actions{box-sizing:border-box;display:flex;width:100%;max-width:100%;min-width:0;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px;padding:1px;overflow:visible}.zcc-actions>*{max-width:100%;min-width:0}.zcc-actions>.zcc-button{flex-shrink:0}.zcc-button{box-sizing:border-box;appearance:none;-moz-appearance:none;max-width:100%;height:31px;padding:0 9px;border:1px solid #cbd5e1;border-radius:7px;background:#fff;color:#111827;cursor:pointer;white-space:nowrap}.zcc-icon-label{display:inline-flex;align-items:center;gap:5px}.zcc-send{flex:0 0 auto;margin-left:auto;background:#111827;color:#fff;border-color:#111827}.zcc-button:disabled{opacity:.5;cursor:default}.zcc-status{min-width:0;flex:1 1 80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#64748b;font-size:11px}
 @container (max-width:480px){.zcc-controls{grid-template-columns:minmax(0,1fr) minmax(54px,72px)}.zcc-controls>.zcc-button{grid-column:1/-1}.zcc-history{grid-template-columns:minmax(0,1fr) max-content max-content}.zcc-note-save{grid-template-columns:minmax(0,1fr) minmax(64px,max-content)}}
@@ -785,6 +786,49 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
         }
         try { renderMath(element); } catch (error) { Zotero.logError(error); }
         try { linkPageCitations(element); } catch (error) { Zotero.logError(error); }
+    }
+
+    function createStreamingPreview(element, view, renderFinal, onUpdate) {
+        let pending = "";
+        let textNode = null;
+        let timer = null;
+        let closed = false;
+        const flush = () => {
+            timer = null;
+            if (closed || !pending) return;
+            if (!textNode) {
+                element.textContent = "";
+                element.classList.add("zcc-streaming");
+                textNode = element.ownerDocument.createTextNode("");
+                element.append(textNode);
+            }
+            textNode.appendData(pending);
+            pending = "";
+            onUpdate();
+        };
+        return {
+            append(delta, source) {
+                if (closed || !delta) return;
+                pending += delta;
+                element._zccMarkdown = source;
+                if (timer === null) timer = view.setTimeout(flush, 100);
+            },
+            finish(source) {
+                if (closed) return;
+                if (timer !== null) view.clearTimeout(timer);
+                timer = null;
+                closed = true;
+                pending = "";
+                element.classList.remove("zcc-streaming");
+                renderFinal(element, source);
+                onUpdate();
+            },
+            cancel() {
+                if (timer !== null) view.clearTimeout(timer);
+                timer = null;
+                closed = true;
+            },
+        };
     }
 
     function linkPageCitations(element) {
@@ -1925,8 +1969,13 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
             this.activeConversation.updatedAt = new Date().toISOString();
             await historyStore.save();
             const answer = this.addMessage("assistant", "");
+            const preview = createStreamingPreview(answer, this.win, setMarkdown, () => {
+                this.updateMessageActions(answer);
+                this.messages.scrollTop = this.messages.scrollHeight;
+            });
             this.status.textContent = ui("thinking", "Codex 正在阅读和思考…");
             this.abortController = new this.win.AbortController();
+            let markdown = "";
             try {
                 const cwd = await conversationWorkingDirectory(this.paper.path);
                 const threadName = `${this.paper.title} — ${this.activeConversation.title}`.replace(/\s+/g, " ").slice(0, 160);
@@ -1949,7 +1998,6 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
                 const reader = response.body.getReader();
                 const decoder = new this.win.TextDecoder();
                 let buffer = "";
-                let markdown = "";
                 while (true) {
                     const result = await reader.read();
                     if (result.done) break;
@@ -1964,10 +2012,9 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
                             this.activeConversation.threadId = event.threadId;
                             historyStore.save().catch(error => Zotero.logError(error));
                         } else if (event.type === "delta") {
-                            markdown += event.text || "";
-                            setMarkdown(answer, markdown);
-                            this.updateMessageActions(answer);
-                            this.messages.scrollTop = this.messages.scrollHeight;
+                            const delta = event.text || "";
+                            markdown += delta;
+                            preview.append(delta, markdown);
                         } else if (event.type === "error") {
                             throw new Error(event.error || ui("chatFailed", "Codex 对话失败"));
                         } else if (event.type === "done" && event.error) {
@@ -1977,24 +2024,21 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
                 }
                 if (!markdown) {
                     markdown = ui("noText", "Codex 没有返回文本。");
-                    setMarkdown(answer, markdown);
-                    this.updateMessageActions(answer);
                 }
+                preview.finish(markdown);
                 this.activeConversation.messages.push({ role: "assistant", text: markdown, createdAt: new Date().toISOString() });
                 this.activeConversation.updatedAt = new Date().toISOString();
                 await historyStore.save();
                 this.status.textContent = ui("done", "完成");
             } catch (error) {
                 if (error.name === "AbortError") {
-                    if (!answer._zccMarkdown) {
-                        setMarkdown(answer, ui("stoppedText", "（已停止）"));
-                        this.updateMessageActions(answer);
-                    }
+                    preview.finish(markdown || ui("stoppedText", "（已停止）"));
                     this.activeConversation.messages.push({ role: "assistant", text: answer._zccMarkdown || ui("stoppedText", "（已停止）"), createdAt: new Date().toISOString() });
                     this.activeConversation.updatedAt = new Date().toISOString();
                     await historyStore.save();
                     this.status.textContent = ui("stopped", "已停止");
                 } else {
+                    preview.cancel();
                     answer.className = "zcc-message zcc-error";
                     answer.dataset.source = ui("conversationFailed", `对话失败：${error.message}`, { error: error.message });
                     delete answer._zccMarkdown;
@@ -2006,6 +2050,7 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
                     this.status.textContent = ui("error", "出错");
                 }
             } finally {
+                preview.cancel();
                 this.busy = false;
                 this.currentTurn = null;
                 this.abortController = null;
@@ -2167,6 +2212,6 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
         await historyStore.flush();
     }
 
-    const testAPI = globalThis.ZCC_TESTING ? { renderMarkdown, splitTableRow, normalizedFontSize, movePaperChatSectionLast } : null;
+    const testAPI = globalThis.ZCC_TESTING ? { renderMarkdown, splitTableRow, normalizedFontSize, movePaperChatSectionLast, createStreamingPreview } : null;
     return { startup, onMainWindowLoad, onMainWindowUnload, shutdown, ...(testAPI ? { __test: testAPI } : {}) };
 })();

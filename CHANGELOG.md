@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here.
 
+## [0.6.6] - 2026-09-19
+
+### Fixed
+
+- Keep Zotero responsive while Codex streams a response by appending a lightweight plain-text preview and rendering Markdown, math, and page links only once when the response finishes or is stopped.
+
 ## [0.6.5] - 2026-08-27
 
 ### Added
