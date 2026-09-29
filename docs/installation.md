@@ -2,7 +2,7 @@
 
 ## 1. 前置条件
 
-1. 在 Windows 10/11 或 macOS 上安装 Zotero 9.0.x 和 Python 3.10+。
+1. 在 Windows 10/11 或 macOS 上安装 Zotero 9.0.x 或 10.0.x，以及 Python 3.10+。
 2. 使用同一系统用户登录官方 Codex 桌面客户端，或安装 Codex CLI 后运行 `codex login`。
 3. 确认该 ChatGPT 账号或工作区可以使用 Codex。插件不会提供额外权限，也不使用 API key。
 
@@ -102,7 +102,7 @@ macOS 日志位于 `~/Library/Application Support/PaperChatForZotero/bridge.log`
 
 ### 插件没有出现在侧栏
 
-确认 Zotero 版本为 9.0.x，插件已启用，并在安装/升级后完整重启 Zotero。仍有问题时，从 `帮助 → 调试输出记录` 获取错误并按 [SUPPORT.md](../SUPPORT.md) 提交。
+确认 Zotero 版本为 9.0.x 或 10.0.x，插件已启用，并在安装/升级后完整重启 Zotero。仍有问题时，从 `帮助 → 调试输出记录` 获取错误并按 [SUPPORT.md](../SUPPORT.md) 提交。
 
 ## 6. 卸载
 

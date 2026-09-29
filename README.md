@@ -20,7 +20,7 @@ Chat with the paper currently open in Zotero, directly from its native sidebar. 
 
 ## Quick install
 
-Requirements: Windows 10/11 or macOS, Zotero 9.0.x, Python 3.10+, and a valid sign-in to the official Codex app or Codex CLI under the same OS account.
+Requirements: Windows 10/11 or macOS, Zotero 9.0.x or 10.0.x, Python 3.10+, and a valid sign-in to the official Codex app or Codex CLI under the same OS account.
 
 1. Download and extract the [latest source archive](https://github.com/Suzuka24/paper-chat-for-zotero/releases/latest), or clone this repository.
 2. Run the installer for your platform.

@@ -4,7 +4,7 @@ Issues and pull requests are welcome.
 
 ## Development setup
 
-Requirements: Windows 10/11 or macOS, Zotero 9.0.x, Python 3.10+, Node.js, and a valid local Codex sign-in.
+Requirements: Windows 10/11 or macOS, Zotero 9.0.x or 10.0.x, Python 3.10+, Node.js, and a valid local Codex sign-in.
 
 1. Fork and clone the repository.
 2. Run `Install.ps1` on Windows or `python3 Install-macOS.py` on macOS to install the local bridge and build a development XPI.

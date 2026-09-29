@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here.
 
+## [0.6.7] - 2026-09-29
+
+### Changed
+
+- Added Zotero 10.0.x compatibility on Windows and macOS while retaining Zotero 9.0.x support.
+
 ## [0.6.6] - 2026-09-19
 
 ### Fixed

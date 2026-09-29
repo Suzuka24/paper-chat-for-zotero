@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-1. Install Zotero 9.0.x and Python 3.10+ on Windows 10/11 or macOS.
+1. Install Zotero 9.0.x or 10.0.x and Python 3.10+ on Windows 10/11 or macOS.
 2. Sign in to the official Codex desktop app under the same OS account, or sign in with the Codex CLI using `codex login`.
 3. Make sure the ChatGPT account or workspace is eligible to use Codex. The plugin does not grant access and does not use an API key.
 
@@ -60,7 +60,7 @@ Diagnostics are written to `~/Library/Application Support/PaperChatForZotero/bri
 - Not connected: start the bridge, inspect the log, and rerun the platform installer if the local token is out of sync.
 - Empty account or model list: sign in again through the official Codex app or `codex login`.
 - Missing paper content: make sure the PDF is local and has a text layer; OCR scanned documents first.
-- Missing sidebar section: verify Zotero 9.0.x, enable the plugin, and fully restart Zotero.
+- Missing sidebar section: verify Zotero 9.0.x or 10.0.x, enable the plugin, and fully restart Zotero.
 
 See [SUPPORT.md](../SUPPORT.md) when filing a bug.
 

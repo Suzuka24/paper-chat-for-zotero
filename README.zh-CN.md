@@ -20,7 +20,7 @@
 
 ## 快速安装
 
-需要 Windows 10/11 或 macOS、Zotero 9.0.x、Python 3.10+，并在同一系统账户中登录过官方 Codex 客户端或 Codex CLI。
+需要 Windows 10/11 或 macOS、Zotero 9.0.x 或 10.0.x、Python 3.10+，并在同一系统账户中登录过官方 Codex 客户端或 Codex CLI。
 
 1. 下载并解压[最新版本源码](https://github.com/Suzuka24/paper-chat-for-zotero/releases/latest)，或克隆本仓库。
 2. 根据系统运行安装器。

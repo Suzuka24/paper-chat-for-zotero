@@ -81,6 +81,12 @@ def main() -> int:
     updates = json.loads((PROJECT_ROOT / "updates.json").read_text(encoding="utf-8"))
     ET.parse(PROJECT_ROOT / "plugin" / "content" / "preferences.xhtml")
 
+    zotero_compatibility = manifest["applications"]["zotero"]
+    if zotero_compatibility["strict_min_version"] != "9.0.0":
+        raise RuntimeError("The plugin must retain Zotero 9 compatibility.")
+    if zotero_compatibility["strict_max_version"] != "10.0.*":
+        raise RuntimeError("The plugin must declare Zotero 10.0.x compatibility.")
+
     first_hash = build()
     second_hash = build()
     if first_hash != second_hash:
