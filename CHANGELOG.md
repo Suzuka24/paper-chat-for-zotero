@@ -8,6 +8,10 @@ All notable changes to this project are documented here.
 
 - Added Zotero 10.0.x compatibility on Windows and macOS while retaining Zotero 9.0.x support.
 
+### Fixed
+
+- Prevented first-click sidebar navigation from landing in blank padding by removing Paper Chat's global item-pane order patch and leaving pane positioning to Zotero.
+
 ## [0.6.6] - 2026-09-19
 
 ### Fixed

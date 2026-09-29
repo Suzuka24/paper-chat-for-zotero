@@ -45,8 +45,8 @@ def main() -> int:
     main_script = (PROJECT_ROOT / "plugin" / "content" / "main.js").read_text(encoding="utf-8")
     if not re.search(r"sidenav:\s*\{[^}]*orderable:\s*false", main_script, re.DOTALL):
         raise RuntimeError("The Paper Chat sidenav button must remain fixed after orderable panes.")
-    if "applyItemPaneOrder" not in main_script or "movePaperChatSectionLast" not in main_script:
-        raise RuntimeError("The Paper Chat content section must remain last in the item pane.")
+    if "applyItemPaneOrder" in main_script or "movePaperChatSectionLast" in main_script:
+        raise RuntimeError("Paper Chat must not patch Zotero's global item-pane ordering.")
     if not re.search(r'registerObserver\(PREF_PREFIX \+ "fontSize",[^;]+, true\)', main_script):
         raise RuntimeError("The Paper Chat font-size preference must be observed by open panels.")
     if 'webSearchMode: pref("webSearchMode", "live")' not in main_script:
