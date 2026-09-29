@@ -51,6 +51,14 @@ def main() -> int:
         raise RuntimeError("Paper Chat must use the native frameless item-pane layout.")
     if not re.search(r"\.zcc-actions\{[^}]*flex-wrap:nowrap", main_script):
         raise RuntimeError("Paper Chat action controls must remain on one row in narrow panes.")
+    if 'doc.createXULElement(tag)' not in main_script or 'list.setAttribute("native", "true")' not in main_script:
+        raise RuntimeError("Paper Chat selects and text buttons must use Zotero-native XUL controls.")
+    if not re.search(r'this\.refreshNotesButton = nativeButton\(this\.doc, ui\("refresh", "刷新"\)\)', main_script):
+        raise RuntimeError("The note refresh control must remain a text-only button.")
+    if "details.initPaneOrder" in main_script or "details.changePaneOrder" in main_script:
+        raise RuntimeError("Paper Chat must not move Zotero item-pane DOM nodes after initialization.")
+    if not re.search(r'section\.style\.order\s*=\s*"2147483647"', main_script):
+        raise RuntimeError("Paper Chat must remain visually last without changing Zotero's pane DOM order.")
     if not re.search(r'registerObserver\(PREF_PREFIX \+ "fontSize",[^;]+, true\)', main_script):
         raise RuntimeError("The Paper Chat font-size preference must be observed by open panels.")
     if 'webSearchMode: pref("webSearchMode", "live")' not in main_script:

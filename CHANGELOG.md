@@ -7,11 +7,14 @@ All notable changes to this project are documented here.
 ### Changed
 
 - Added Zotero 10.0.x compatibility on Windows and macOS while retaining Zotero 9.0.x support.
+- Updated the bundled Codex App Server baseline so the model picker follows the current Codex desktop model catalog.
+- Replaced Paper Chat's simulated HTML selects and text buttons with the same native XUL control types used by Translate for Zotero, while retaining tighter rows and a text-only note refresh button.
 
 ### Fixed
 
 - Prevented first-click sidebar navigation from landing in blank padding by removing Paper Chat's global item-pane order patch and leaving pane positioning to Zotero.
 - Removed the outer card around Paper Chat and kept control rows on one line in narrow sidebars for a lighter, native item-pane layout.
+- Kept Paper Chat's content section visually aligned with its last sidebar icon without moving Zotero's pane DOM nodes, preserving first-click sidebar navigation.
 
 ## [0.6.6] - 2026-09-19
 

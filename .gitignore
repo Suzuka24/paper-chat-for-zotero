@@ -4,6 +4,7 @@ bridge/bridge.log
 bridge/bridge.pid
 bridge/token.txt
 dist/
+ref/
 __pycache__/
 *.pyc
 .tmp-katex/

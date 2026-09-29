@@ -20,7 +20,7 @@ import urllib.request
 from pathlib import Path
 
 
-DEFAULT_CODEX_VERSION = "rust-v0.149.1"
+DEFAULT_CODEX_VERSION = "rust-v0.157.1"
 LAUNCH_LABEL = "io.github.suzuka24.paper-chat-for-zotero-bridge"
 
 
@@ -159,6 +159,24 @@ def install_codex_component(version: str, component: str, destination: Path) -> 
     print(f"Installed {component} {version}.")
 
 
+def component_matches_version(destination: Path, version: str) -> bool:
+    if not destination.is_file():
+        return False
+    try:
+        result = subprocess.run(
+            [str(destination), "--version"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return False
+    expected = version.removeprefix("rust-v")
+    output = f"{result.stdout}\n{result.stderr}"
+    return result.returncode == 0 and expected in output.split()
+
+
 def write_launch_agent(
     launch_agent: Path,
     python_binary: Path,
@@ -228,9 +246,9 @@ def main() -> int:
     (install_root / "python-bin.txt").chmod(0o600)
     ensure_token(install_root / "token.txt")
 
-    if not app_server.is_file():
+    if not component_matches_version(app_server, args.codex_version):
         if args.skip_download:
-            raise RuntimeError("Codex App Server is not installed; --skip-download cannot be used.")
+            raise RuntimeError("The installed Codex App Server does not match --codex-version; --skip-download cannot be used.")
         install_codex_component(args.codex_version, "codex-app-server", app_server)
     if not code_mode_host.is_file():
         if args.skip_download:

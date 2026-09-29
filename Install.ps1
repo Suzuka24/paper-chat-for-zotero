@@ -1,7 +1,7 @@
 param(
     [switch]$NoAutoStart,
     [switch]$SkipDownload,
-    [string]$CodexVersion = 'rust-v0.149.1'
+    [string]$CodexVersion = 'rust-v0.157.1'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -52,7 +52,13 @@ if ($token -notmatch '^[a-fA-F0-9]{64}$') {
 [IO.File]::WriteAllText($tokenFile, $token, [Text.UTF8Encoding]::new($false))
 Write-Output 'Created a per-installation loopback bridge token.'
 
-if (-not (Test-Path -LiteralPath $appServer -PathType Leaf) -or -not (Test-Path -LiteralPath $codeModeHost -PathType Leaf)) {
+$expectedCodexVersion = $CodexVersion -replace '^rust-v', ''
+$appServerVersionMatches = $false
+if (Test-Path -LiteralPath $appServer -PathType Leaf) {
+    $installedAppServerVersion = (& $appServer --version 2>$null | Out-String).Trim()
+    $appServerVersionMatches = $LASTEXITCODE -eq 0 -and $installedAppServerVersion -match "(^|\s)$([regex]::Escape($expectedCodexVersion))(\s|$)"
+}
+if (-not $appServerVersionMatches -or -not (Test-Path -LiteralPath $codeModeHost -PathType Leaf)) {
     if ($SkipDownload) {
         throw 'Codex App Server or Code Mode Host is not installed; -SkipDownload cannot be used.'
     }
@@ -68,7 +74,10 @@ if (-not (Test-Path -LiteralPath $appServer -PathType Leaf) -or -not (Test-Path 
         @{ Name = 'codex-app-server'; Destination = $appServer },
         @{ Name = 'codex-code-mode-host'; Destination = $codeModeHost }
     )) {
-        if (Test-Path -LiteralPath $component.Destination -PathType Leaf) {
+        if ($component.Name -eq 'codex-app-server' -and $appServerVersionMatches) {
+            continue
+        }
+        if ($component.Name -eq 'codex-code-mode-host' -and (Test-Path -LiteralPath $component.Destination -PathType Leaf)) {
             continue
         }
         $assetName = "$($component.Name)-$architecture-pc-windows-msvc.exe"

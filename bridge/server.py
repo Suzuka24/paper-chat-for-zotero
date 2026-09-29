@@ -73,7 +73,7 @@ class CodexAppServer:
                 "clientInfo": {
                     "name": "paper_chat_for_zotero",
                     "title": "Paper Chat for Zotero",
-                    "version": "0.6.2",
+                    "version": "0.6.7",
                 }
             },
             timeout=30,

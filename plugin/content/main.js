@@ -358,6 +358,41 @@ var ZoteroCodexChatPlugin = (() => {
         return element;
     }
 
+    function xul(doc, tag, className) {
+        const element = doc.createXULElement(tag);
+        if (className) element.className = className;
+        return element;
+    }
+
+    function nativeButton(doc, label, className = "zcc-button") {
+        const button = xul(doc, "button", className);
+        button.setAttribute("label", label);
+        return button;
+    }
+
+    function nativeMenuList(doc, className = "zcc-select") {
+        const list = xul(doc, "menulist", className);
+        list.setAttribute("native", "true");
+        list.append(xul(doc, "menupopup"));
+        return list;
+    }
+
+    function nativeMenuItem(doc, label, value, title = "") {
+        const item = xul(doc, "menuitem");
+        item.setAttribute("label", label);
+        item.setAttribute("value", value);
+        if (title) item.setAttribute("tooltiptext", title);
+        return item;
+    }
+
+    function menuItems(list) {
+        return [...list.querySelectorAll(":scope > menupopup > menuitem")];
+    }
+
+    function replaceMenuItems(list, items) {
+        list.querySelector(":scope > menupopup").replaceChildren(...items);
+    }
+
     function iconButton(doc, title, pathData, label = "") {
         const button = html(doc, "button", label ? "zcc-button zcc-icon-label" : "zcc-icon-button");
         button.type = "button";
@@ -412,6 +447,11 @@ var ZoteroCodexChatPlugin = (() => {
         button.setAttribute("aria-label", label);
     }
 
+    function placeSectionVisuallyLast(sectionBody) {
+        const section = sectionBody?.closest("item-pane-custom-section");
+        if (section) section.style.order = "2147483647";
+    }
+
     function bridgeHeaders() {
         return {
             "Content-Type": "application/json",
@@ -445,17 +485,17 @@ var ZoteroCodexChatPlugin = (() => {
 .zcc-section-host{box-sizing:border-box;display:block;width:100%;max-width:100%;min-width:0;overflow-x:hidden;container-type:inline-size}
 item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent;font-size:0;line-height:0;text-indent:-9999px;white-space:nowrap}
 .zcc-panel{box-sizing:border-box;display:flex;flex-direction:column;width:100%;max-width:100%;min-width:0;height:min(68vh,760px);min-height:470px;margin:0;background:transparent;color:#111827;border:0;border-radius:0;overflow:hidden;font:13px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}.zcc-panel>*{box-sizing:border-box;width:100%;max-width:100%;min-width:0}
-.zcc-controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(48px,72px) max-content;gap:5px;padding:5px 0 8px;border-bottom:1px solid #e2e8f0;background:transparent;overflow:hidden}.zcc-select{box-sizing:border-box;width:100%;max-width:100%;min-width:0;height:32px;border:1px solid #cbd5e1;border-radius:7px;background:#fff;color:#111827;padding:0 7px}.zcc-context{min-width:0;padding:8px 0;border-bottom:1px solid #e2e8f0;background:transparent;overflow:hidden}.zcc-paper{max-width:100%;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.zcc-muted{max-width:100%;color:#64748b;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.zcc-note-picker{margin-top:6px}.zcc-attachments{display:flex;min-width:0;gap:5px;flex-wrap:wrap;margin-top:6px}.zcc-chip{display:inline-flex;align-items:center;gap:4px;max-width:100%;min-width:0;padding:3px 7px;border-radius:999px;background:#e2e8f0}.zcc-chip span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.zcc-chip button{border:0;background:transparent;cursor:pointer;color:#64748b;padding:0}
+.zcc-controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(48px,72px) max-content;gap:4px;padding:2px 0 5px;border-bottom:1px solid #e2e8f0;background:transparent;overflow:hidden}.zcc-select{box-sizing:border-box;width:100%;max-width:100%;min-width:0;margin:0;font:inherit}.zcc-context{min-width:0;padding:6px 0;border-bottom:1px solid #e2e8f0;background:transparent;overflow:hidden}.zcc-paper{max-width:100%;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.zcc-muted{max-width:100%;color:#64748b;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.zcc-note-picker{margin-top:4px}.zcc-attachments{display:flex;min-width:0;gap:4px;flex-wrap:wrap;margin-top:4px}.zcc-chip{display:inline-flex;align-items:center;gap:4px;max-width:100%;min-width:0;padding:3px 7px;border-radius:999px;background:#e2e8f0}.zcc-chip span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.zcc-chip button{border:0;background:transparent;cursor:pointer;color:#64748b;padding:0}
 .zcc-attachments:empty{display:none}
-.zcc-history{display:grid;grid-template-columns:minmax(0,1fr) max-content max-content;gap:5px;padding:0 0 8px;background:transparent;border-bottom:1px solid #e2e8f0;overflow:hidden}.zcc-history .zcc-button{padding:0 7px}.zcc-note-save{display:grid;grid-template-columns:minmax(0,1fr) minmax(64px,max-content);gap:4px;margin-top:4px;min-width:0}.zcc-page-link{display:inline;border:0;border-bottom:1px dashed currentColor;padding:0;background:transparent;color:#2563eb;font:inherit;cursor:pointer}
-.zcc-note-context-row{display:grid;grid-template-columns:minmax(0,1fr) max-content;gap:4px;margin-top:4px;min-width:0}.zcc-note-context-row .zcc-note-picker{margin-top:0}.zcc-note-context-row>*,.zcc-note-save>*{box-sizing:border-box;max-width:100%;min-width:0;height:30px;min-height:30px;margin:0}.zcc-note-context-row>.zcc-button{display:inline-flex;align-items:center;justify-content:center;padding:0 7px}
-.zcc-controls{border-bottom:0}.zcc-controls,.zcc-history{align-items:stretch}.zcc-controls>*,.zcc-history>*{box-sizing:border-box;max-width:100%;min-width:0;height:32px;min-height:32px;margin:0;align-self:stretch}.zcc-controls>.zcc-button,.zcc-history>.zcc-button{display:inline-flex;align-items:center;justify-content:center;padding-top:0;padding-bottom:0;line-height:1}
+.zcc-history{display:grid;grid-template-columns:minmax(0,1fr) max-content max-content;gap:4px;padding:0 0 5px;background:transparent;border-bottom:1px solid #e2e8f0;overflow:hidden}.zcc-history .zcc-button{padding:0 7px}.zcc-note-save{display:grid;grid-template-columns:minmax(0,1fr) minmax(64px,max-content);gap:4px;margin-top:3px;min-width:0}.zcc-page-link{display:inline;border:0;border-bottom:1px dashed currentColor;padding:0;background:transparent;color:#2563eb;font:inherit;cursor:pointer}
+.zcc-note-context-row{display:grid;grid-template-columns:minmax(0,1fr) max-content;gap:4px;margin-top:3px;min-width:0}.zcc-note-context-row .zcc-note-picker{margin-top:0}.zcc-note-context-row>*,.zcc-note-save>*{box-sizing:border-box;max-width:100%;min-width:0;margin:0}.zcc-note-context-row>.zcc-button{min-width:auto}
+.zcc-controls{border-bottom:0}.zcc-controls,.zcc-history{align-items:center}.zcc-controls>*,.zcc-history>*{box-sizing:border-box;max-width:100%;min-width:0;margin:0}.zcc-controls>.zcc-button,.zcc-history>.zcc-button{min-width:auto}
 .zcc-messages{box-sizing:border-box;contain:inline-size;flex:1;width:100%;max-width:100%;min-width:0;min-height:210px;overflow-x:hidden;overflow-y:auto;padding:10px 0;display:flex;flex-direction:column;gap:9px}.zcc-turn{box-sizing:border-box;display:flex;flex-direction:column;width:100%;max-width:100%;min-width:0}.zcc-turn-user{align-items:flex-end}.zcc-turn-assistant,.zcc-turn-error{align-items:stretch}.zcc-message{box-sizing:border-box;width:auto;max-width:100%;min-width:0;padding:8px 10px;border-radius:9px;overflow-wrap:anywhere;word-break:break-word;user-select:text}.zcc-turn-user .zcc-message{width:fit-content;align-self:flex-end}.zcc-turn-assistant .zcc-message,.zcc-turn-error .zcc-message{width:100%;align-self:stretch}.zcc-user{background:#2563eb;color:#fff;white-space:pre-wrap}.zcc-assistant{background:#fff;border:1px solid #dbe2ea;overflow:hidden}.zcc-error{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;white-space:pre-wrap}.zcc-message-tools{display:flex;gap:2px;margin-top:3px;opacity:.68;transition:opacity .15s}.zcc-turn:hover .zcc-message-tools,.zcc-message-tools:focus-within{opacity:1}.zcc-icon-button{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;padding:4px;border:0;border-radius:5px;background:transparent;color:#64748b;cursor:pointer}.zcc-icon-button:hover{background:#e2e8f0;color:#0f172a}.zcc-icon-button:disabled{opacity:.35;cursor:default}.zcc-icon-button svg,.zcc-icon-label svg{display:block;width:16px;height:16px;flex:0 0 auto}
 .zcc-assistant.zcc-streaming{white-space:pre-wrap}
 .zcc-assistant>:first-child{margin-top:0}.zcc-assistant>:last-child{margin-bottom:0}.zcc-assistant p{max-width:100%;margin:.45em 0;white-space:normal;overflow-wrap:anywhere;word-break:break-word}.zcc-assistant h1,.zcc-assistant h2,.zcc-assistant h3,.zcc-assistant h4,.zcc-assistant h5,.zcc-assistant h6{max-width:100%;line-height:1.3;margin:.8em 0 .35em;font-weight:700;white-space:normal;overflow-wrap:anywhere}.zcc-assistant h1{font-size:1.28em}.zcc-assistant h2{font-size:1.2em}.zcc-assistant h3{font-size:1.12em}.zcc-assistant ul,.zcc-assistant ol{box-sizing:border-box;max-width:100%;margin:.4em 0;padding-left:1.6em}.zcc-assistant li{min-width:0;margin:.18em 0;white-space:normal;overflow-wrap:anywhere;word-break:break-word}.zcc-assistant blockquote{box-sizing:border-box;width:100%;max-width:100%;margin:.55em 0;padding:.15em .75em;border-left:3px solid #94a3b8;color:#475569;white-space:normal;overflow-wrap:anywhere;word-break:break-word}.zcc-assistant code{max-width:100%;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#e2e8f0;border-radius:4px;padding:.08em .3em;font-size:.92em;overflow-wrap:anywhere;word-break:break-word}.zcc-assistant pre{box-sizing:border-box;width:100%;max-width:100%;margin:.6em 0;padding:9px;overflow-x:auto;border-radius:7px;background:#0f172a;color:#e2e8f0;white-space:pre-wrap;overflow-wrap:anywhere}.zcc-assistant pre code{padding:0;background:transparent;color:inherit}.zcc-assistant table{box-sizing:border-box;width:100%;max-width:100%;table-layout:fixed;margin:.55em 0;border-collapse:collapse;font-size:.95em}.zcc-assistant th,.zcc-assistant td{min-width:0;padding:4px 6px;border:1px solid #cbd5e1;text-align:left;vertical-align:top;overflow-wrap:anywhere;word-break:break-word}.zcc-assistant th{background:#f1f5f9}.zcc-assistant a{color:#2563eb;text-decoration:underline;overflow-wrap:anywhere;word-break:break-word}.zcc-assistant hr{border:0;border-top:1px solid #cbd5e1;margin:.8em 0}.zcc-math-inline{display:inline-block;max-width:none;overflow:visible;vertical-align:middle}.zcc-math-inline-overflow{max-width:100%;overflow-x:auto;overflow-y:hidden}.zcc-math-display{box-sizing:border-box;display:block;width:100%;max-width:100%;margin:.55em 0;overflow-x:auto;overflow-y:hidden;text-align:center}.zcc-math-display>.katex-display{min-width:max-content;margin:0}.zcc-math-pipeline{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.35em .5em;overflow-x:hidden}.zcc-math-pipeline-link{display:inline-flex;align-items:center;gap:.5em;max-width:100%;min-width:0}.zcc-math-step{display:inline-block;max-width:100%;min-width:0;overflow-x:auto;overflow-y:hidden}.zcc-math-arrow{flex:0 0 auto}.zcc-math-error{color:#b91c1c;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap}
-.zcc-resize-handle{box-sizing:border-box;display:flex;align-items:center;justify-content:center;flex:0 0 11px;height:11px;border-top:1px solid #e2e8f0;background:transparent;cursor:ns-resize;touch-action:none}.zcc-resize-handle::before{content:"";display:block;width:42px;height:3px;border-radius:999px;background:#94a3b8;opacity:.7}.zcc-resize-handle:hover::before,.zcc-resize-handle:focus::before{background:#2563eb;opacity:1}.zcc-compose{box-sizing:border-box;flex:0 0 auto;width:100%;min-width:0;padding:9px 0 6px;background:transparent;overflow:visible}.zcc-textarea{box-sizing:border-box;width:100%;max-width:100%;min-width:0;min-height:68px;max-height:170px;resize:vertical;border:1px solid #cbd5e1;border-radius:8px;padding:8px;font:inherit;color:#111827;background:#fff}.zcc-actions{box-sizing:border-box;display:flex;width:100%;max-width:100%;min-width:0;align-items:center;gap:4px;flex-wrap:nowrap;margin-top:6px;padding:1px 0;overflow:hidden}.zcc-actions>*{max-width:100%;min-width:0}.zcc-actions>.zcc-button{flex-shrink:0}.zcc-button{box-sizing:border-box;appearance:none;-moz-appearance:none;max-width:100%;height:31px;padding:0 7px;border:1px solid #cbd5e1;border-radius:7px;background:#fff;color:#111827;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.zcc-icon-label{display:inline-flex;align-items:center;gap:4px;min-width:0;white-space:nowrap}.zcc-send{flex:0 0 auto;margin-left:auto;background:#111827;color:#fff;border-color:#111827}.zcc-button:disabled{opacity:.5;cursor:default}.zcc-status{min-width:0;flex:1 1 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#64748b;font-size:11px}
+.zcc-resize-handle{box-sizing:border-box;display:flex;align-items:center;justify-content:center;flex:0 0 11px;height:11px;border-top:1px solid #e2e8f0;background:transparent;cursor:ns-resize;touch-action:none}.zcc-resize-handle::before{content:"";display:block;width:42px;height:3px;border-radius:999px;background:#94a3b8;opacity:.7}.zcc-resize-handle:hover::before,.zcc-resize-handle:focus::before{background:#2563eb;opacity:1}.zcc-compose{box-sizing:border-box;flex:0 0 auto;width:100%;min-width:0;padding:7px 0 4px;background:transparent;overflow:visible}.zcc-textarea{box-sizing:border-box;width:100%;max-width:100%;min-width:0;min-height:68px;max-height:170px;resize:vertical;border:1px solid #cbd5e1;border-radius:8px;padding:8px;font:inherit;color:#111827;background:#fff}.zcc-actions{box-sizing:border-box;display:flex;width:100%;max-width:100%;min-width:0;align-items:center;gap:4px;flex-wrap:nowrap;margin-top:4px;padding:0;overflow:hidden}.zcc-actions>*{max-width:100%;min-width:0}.zcc-actions>.zcc-button{flex-shrink:0}.zcc-button{box-sizing:border-box;max-width:100%;min-width:auto;margin:0;font:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.zcc-icon-label{display:inline-flex;align-items:center;gap:4px;min-width:0;white-space:nowrap}.zcc-send{flex:0 0 auto;margin-left:auto}.zcc-button:disabled{opacity:.5;cursor:default}.zcc-status{min-width:0;flex:1 1 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#64748b;font-size:11px}
 @container (max-width:360px){.zcc-controls,.zcc-history{gap:4px}.zcc-controls{grid-template-columns:minmax(0,1fr) minmax(44px,58px) max-content}.zcc-controls>.zcc-button,.zcc-history>.zcc-button{padding-left:5px;padding-right:5px}.zcc-note-context-row,.zcc-note-save{grid-template-columns:minmax(0,1fr) max-content}.zcc-actions{gap:3px}.zcc-actions>.zcc-button{padding-left:5px;padding-right:5px}}
-@media(prefers-color-scheme:dark){.zcc-panel{background:transparent;color:#e5e7eb}.zcc-controls,.zcc-history,.zcc-context,.zcc-compose{background:transparent;border-color:#374151}.zcc-select,.zcc-textarea,.zcc-button{background:#111827;color:#e5e7eb;border-color:#4b5563}.zcc-resize-handle{background:transparent;border-color:#374151}.zcc-assistant{background:#1f2937;border-color:#374151}.zcc-chip,.zcc-assistant code{background:#374151}.zcc-icon-button{color:#94a3b8}.zcc-icon-button:hover{background:#374151;color:#f8fafc}.zcc-assistant blockquote{color:#cbd5e1}.zcc-assistant th{background:#111827}.zcc-assistant th,.zcc-assistant td{border-color:#4b5563}.zcc-assistant a,.zcc-page-link{color:#60a5fa}}
+@media(prefers-color-scheme:dark){.zcc-panel{background:transparent;color:#e5e7eb}.zcc-controls,.zcc-history,.zcc-context,.zcc-compose{background:transparent;border-color:#374151}.zcc-textarea{background:#111827;color:#e5e7eb;border-color:#4b5563}.zcc-resize-handle{background:transparent;border-color:#374151}.zcc-assistant{background:#1f2937;border-color:#374151}.zcc-chip,.zcc-assistant code{background:#374151}.zcc-icon-button{color:#94a3b8}.zcc-icon-button:hover{background:#374151;color:#f8fafc}.zcc-assistant blockquote{color:#cbd5e1}.zcc-assistant th{background:#111827}.zcc-assistant th,.zcc-assistant td{border-color:#4b5563}.zcc-assistant a,.zcc-page-link{color:#60a5fa}}
 `;
     }
 
@@ -1107,11 +1147,9 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
             this.setPanelHeight(Number.isFinite(savedHeight) ? savedHeight : 900, false);
 
             const controls = html(this.doc, "div", "zcc-controls");
-            this.model = html(this.doc, "select", "zcc-select");
-            const loading = html(this.doc, "option", "", ui("modelLoading", "正在读取模型…"));
-            loading.value = "";
-            this.model.append(loading);
-            this.model.addEventListener("change", () => {
+            this.model = nativeMenuList(this.doc);
+            replaceMenuItems(this.model, [nativeMenuItem(this.doc, ui("modelLoading", "正在读取模型…"), "")]);
+            this.model.addEventListener("command", () => {
                 setPref("model", this.model.value);
                 this.updateEfforts();
                 if (this.activeConversation) {
@@ -1119,32 +1157,30 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
                     historyStore.save().catch(error => Zotero.logError(error));
                 }
             });
-            this.effort = html(this.doc, "select", "zcc-select");
+            this.effort = nativeMenuList(this.doc);
             for (const [value, label] of [["low", ui("effortLow", "低")], ["medium", ui("effortMedium", "中")], ["high", ui("effortHigh", "高")], ["xhigh", ui("effortXhigh", "极高")]]) {
-                const option = html(this.doc, "option", "", label);
-                option.value = value;
-                this.effort.append(option);
+                this.effort.querySelector("menupopup").append(nativeMenuItem(this.doc, label, value));
             }
             this.effort.value = pref("effort", "medium");
-            this.effort.addEventListener("change", () => {
+            this.effort.addEventListener("command", () => {
                 setPref("effort", this.effort.value);
                 if (this.activeConversation) {
                     this.activeConversation.effort = this.effort.value;
                     historyStore.save().catch(error => Zotero.logError(error));
                 }
             });
-            this.newChatButton = html(this.doc, "button", "zcc-button", ui("newConversation", "新对话"));
+            this.newChatButton = nativeButton(this.doc, ui("newConversation", "新对话"));
             this.newChatButton.title = ui("newChatTitle", "为当前论文新建一条独立对话");
             this.newChatButton.addEventListener("click", () => this.newChat());
             controls.append(this.model, this.effort, this.newChatButton);
 
             const history = html(this.doc, "div", "zcc-history");
-            this.conversationPicker = html(this.doc, "select", "zcc-select");
+            this.conversationPicker = nativeMenuList(this.doc);
             this.conversationPicker.title = ui("historyTitle", "当前论文的历史对话");
-            this.conversationPicker.addEventListener("change", () => this.switchConversation(this.conversationPicker.value));
-            this.renameConversationButton = html(this.doc, "button", "zcc-button", ui("rename", "重命名"));
+            this.conversationPicker.addEventListener("command", () => this.switchConversation(this.conversationPicker.value));
+            this.renameConversationButton = nativeButton(this.doc, ui("rename", "重命名"));
             this.renameConversationButton.addEventListener("click", () => this.renameConversation());
-            this.deleteConversationButton = html(this.doc, "button", "zcc-button", ui("delete", "删除"));
+            this.deleteConversationButton = nativeButton(this.doc, ui("delete", "删除"));
             this.deleteConversationButton.addEventListener("click", () => this.deleteConversation());
             history.append(this.conversationPicker, this.renameConversationButton, this.deleteConversationButton);
 
@@ -1155,23 +1191,22 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
             this.attachmentList = html(this.doc, "div", "zcc-attachments");
             this.noteList = html(this.doc, "div", "zcc-attachments");
             this.selectionList = html(this.doc, "div", "zcc-attachments");
-            this.notePicker = html(this.doc, "select", "zcc-select zcc-note-picker");
-            this.notePicker.addEventListener("change", () => this.addSelectedNote());
+            this.notePicker = nativeMenuList(this.doc, "zcc-select zcc-note-picker");
+            this.notePicker.addEventListener("command", () => this.addSelectedNote());
             const noteContextRow = html(this.doc, "div", "zcc-note-context-row");
-            this.refreshNotesButton = iconButton(this.doc, ui("refreshNotesTitle", "重新读取当前条目的笔记信息"), "M20 11a8 8 0 1 1-2.34-5.66M20 4v7h-7", ui("refresh", "刷新"));
+            this.refreshNotesButton = nativeButton(this.doc, ui("refresh", "刷新"));
+            this.refreshNotesButton.title = ui("refreshNotesTitle", "重新读取当前条目的笔记信息");
             this.refreshNotesButton.addEventListener("click", () => this.refreshNotes());
             noteContextRow.append(this.notePicker, this.refreshNotesButton);
             const noteSave = html(this.doc, "div", "zcc-note-save");
-            this.noteTargetPicker = html(this.doc, "select", "zcc-select");
+            this.noteTargetPicker = nativeMenuList(this.doc);
             this.noteTargetPicker.title = ui("noteTargetTitle", "消息和完整对话要保存到的目标笔记");
-            this.noteTargetPicker.addEventListener("change", () => {
+            this.noteTargetPicker.addEventListener("command", () => {
                 this.noteSaveMode.disabled = this.noteTargetPicker.value === "new";
             });
-            this.noteSaveMode = html(this.doc, "select", "zcc-select");
+            this.noteSaveMode = nativeMenuList(this.doc);
             for (const [value, label] of [["append", ui("append", "追加")], ["replace", ui("replace", "更新/覆盖")]]) {
-                const option = html(this.doc, "option", "", label);
-                option.value = value;
-                this.noteSaveMode.append(option);
+                this.noteSaveMode.querySelector("menupopup").append(nativeMenuItem(this.doc, label, value));
             }
             noteSave.append(this.noteTargetPicker, this.noteSaveMode);
             context.append(this.paperLabel, this.contextHint, this.attachmentList, this.noteList, this.selectionList, noteContextRow, noteSave);
@@ -1192,16 +1227,17 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
                 }
             });
             const actions = html(this.doc, "div", "zcc-actions");
-            this.backupButton = iconButton(this.doc, ui("backupTitle", "将当前完整对话备份为条目笔记"), "M6 3h9l4 4v14H6zM15 3v5h4M9 12h7M9 16h7", ui("backup", "备份笔记"));
+            this.backupButton = nativeButton(this.doc, ui("backup", "备份笔记"));
+            this.backupButton.title = ui("backupTitle", "将当前完整对话备份为条目笔记");
             this.backupButton.addEventListener("click", () => this.backupConversation());
-            this.attachButton = html(this.doc, "button", "zcc-button", ui("attachment", "附件"));
+            this.attachButton = nativeButton(this.doc, ui("attachment", "附件"));
             this.attachButton.title = ui("attachmentTitle", "添加本地附件");
             this.attachButton.addEventListener("click", () => this.chooseAttachments());
-            this.stopButton = html(this.doc, "button", "zcc-button", ui("stop", "停止"));
+            this.stopButton = nativeButton(this.doc, ui("stop", "停止"));
             this.stopButton.hidden = true;
             this.stopButton.addEventListener("click", () => this.stop());
             this.status = html(this.doc, "div", "zcc-status", ui("bridgeUnchecked", "桥接服务未检查"));
-            this.sendButton = html(this.doc, "button", "zcc-button zcc-send", ui("send", "发送"));
+            this.sendButton = nativeButton(this.doc, ui("send", "发送"), "zcc-button zcc-send");
             this.sendButton.addEventListener("click", () => this.send());
             actions.append(this.backupButton, this.attachButton, this.stopButton, this.status, this.sendButton);
             compose.append(this.textarea, actions);
@@ -1297,13 +1333,12 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
         }
 
         renderConversationPicker() {
-            this.conversationPicker.replaceChildren();
+            const items = [];
             for (const conversation of this.paperHistory?.conversations || []) {
-                const option = html(this.doc, "option", "", conversation.title || ui("unnamedConversation", "未命名对话"));
-                option.value = conversation.id;
-                option.selected = conversation.id === this.activeConversation?.id;
-                this.conversationPicker.append(option);
+                items.push(nativeMenuItem(this.doc, conversation.title || ui("unnamedConversation", "未命名对话"), conversation.id));
             }
+            replaceMenuItems(this.conversationPicker, items);
+            this.conversationPicker.value = this.activeConversation?.id || "";
             this.renameConversationButton.disabled = !this.activeConversation;
             this.deleteConversationButton.disabled = (this.paperHistory?.conversations.length || 0) <= 1;
         }
@@ -1330,7 +1365,7 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
             this.paperHistory.activeConversationId = conversation.id;
             this.model.value = conversation.model || pref("model", this.model.value);
             this.updateEfforts();
-            if (conversation.effort && [...this.effort.options].some(option => option.value === conversation.effort)) {
+            if (conversation.effort && menuItems(this.effort).some(option => option.value === conversation.effort)) {
                 this.effort.value = conversation.effort;
             }
             this.loadActiveConversation();
@@ -1423,12 +1458,12 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
                 this.contextHint.hidden = false;
                 this.renderNoteContexts();
                 this.renderSelectionContexts();
-                this.conversationPicker.replaceChildren(html(this.doc, "option", "", ui("noConversation", "没有可用对话")));
+                replaceMenuItems(this.conversationPicker, [nativeMenuItem(this.doc, ui("noConversation", "没有可用对话"), "")]);
                 this.renameConversationButton.disabled = true;
                 this.deleteConversationButton.disabled = true;
-                this.notePicker.replaceChildren(html(this.doc, "option", "", ui("noNotes", "当前条目没有可用笔记")));
+                replaceMenuItems(this.notePicker, [nativeMenuItem(this.doc, ui("noNotes", "当前条目没有可用笔记"), "")]);
                 this.notePicker.disabled = true;
-                this.noteTargetPicker.replaceChildren(html(this.doc, "option", "", ui("saveNewStandalone", "保存到：新建独立笔记")));
+                replaceMenuItems(this.noteTargetPicker, [nativeMenuItem(this.doc, ui("saveNewStandalone", "保存到：新建独立笔记"), "")]);
                 this.noteTargetPicker.value = "";
                 this.noteSaveMode.disabled = true;
             }
@@ -1442,19 +1477,20 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
                 const models = data.data || [];
                 this.availableModels = models;
                 const saved = pref("model", "");
-                this.model.replaceChildren();
+                const modelItems = [];
                 for (const entry of models) {
-                    const option = html(this.doc, "option", "", entry.displayName || entry.model || entry.id);
-                    option.value = entry.model || entry.id;
-                    if ((saved && option.value === saved) || (!saved && entry.isDefault)) option.selected = true;
-                    this.model.append(option);
+                    const value = entry.model || entry.id;
+                    modelItems.push(nativeMenuItem(this.doc, entry.displayName || value, value, entry.description || ""));
                 }
+                replaceMenuItems(this.model, modelItems);
+                const defaultModel = models.find(entry => entry.isDefault)?.model || models.find(entry => entry.isDefault)?.id || "";
+                this.model.value = saved && menuItems(this.model).some(item => item.value === saved) ? saved : defaultModel;
                 this.updateEfforts();
-                if (this.activeConversation?.model && [...this.model.options].some(option => option.value === this.activeConversation.model)) {
+                if (this.activeConversation?.model && menuItems(this.model).some(option => option.value === this.activeConversation.model)) {
                     this.model.value = this.activeConversation.model;
                     this.updateEfforts();
                 }
-                if (this.activeConversation?.effort && [...this.effort.options].some(option => option.value === this.activeConversation.effort)) {
+                if (this.activeConversation?.effort && menuItems(this.effort).some(option => option.value === this.activeConversation.effort)) {
                     this.effort.value = this.activeConversation.effort;
                 }
                 if (this.model.value) setPref("model", this.model.value);
@@ -1466,7 +1502,7 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
                     this.status.textContent = ui("lifecycleMigrationFailed", `会话整理将在稍后重试：${error.message}`, { error: error.message });
                 }
             } catch (error) {
-                this.model.replaceChildren(html(this.doc, "option", "", ui("disconnected", "Codex 未连接")));
+                replaceMenuItems(this.model, [nativeMenuItem(this.doc, ui("disconnected", "Codex 未连接"), "")]);
                 this.status.textContent = ui("runBridge", "请运行 Start-Bridge.ps1");
                 this.addMessage("error", ui("bridgeError", `无法连接本地桥接服务：${error.message}\n请先运行项目中的 Install.ps1 或 bridge/Start-Bridge.ps1。`, { error: error.message }));
             }
@@ -1477,19 +1513,16 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
             const supported = model?.supportedReasoningEfforts || [];
             if (!supported.length) return;
             const saved = pref("effort", model.defaultReasoningEffort || "medium");
-            this.effort.replaceChildren();
+            const effortItems = [];
             for (const entry of supported) {
                 const value = entry.reasoningEffort;
                 const label = value === "xhigh" ? ui("effortXhigh", "极高") : value === "high" ? ui("effortHigh", "高") : value === "medium" ? ui("effortMedium", "中") : ui("effortLow", "低");
-                const option = html(this.doc, "option", "", label);
-                option.value = value;
-                option.title = entry.description || "";
-                if (value === saved) option.selected = true;
-                this.effort.append(option);
+                effortItems.push(nativeMenuItem(this.doc, label, value, entry.description || ""));
             }
-            if (![...this.effort.options].some(option => option.selected)) {
-                this.effort.value = model.defaultReasoningEffort || supported[0].reasoningEffort;
-            }
+            replaceMenuItems(this.effort, effortItems);
+            this.effort.value = effortItems.some(item => item.value === saved)
+                ? saved
+                : model.defaultReasoningEffort || supported[0].reasoningEffort;
             setPref("effort", this.effort.value);
         }
 
@@ -1607,31 +1640,26 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
 
         async refreshNotePicker() {
             const selectedTarget = this.noteTargetPicker.value || "new";
-            const placeholder = html(this.doc, "option", "", ui("noteContextPlaceholder", "添加条目笔记作为上下文…"));
-            placeholder.value = "";
-            this.notePicker.replaceChildren(placeholder);
-            const newTarget = html(this.doc, "option", "", ui("saveNewNote", "保存到：新建条目笔记"));
-            newTarget.value = "new";
-            this.noteTargetPicker.replaceChildren(newTarget);
+            const placeholder = nativeMenuItem(this.doc, ui("noteContextPlaceholder", "添加条目笔记作为上下文…"), "");
+            const noteItems = [placeholder];
+            const targetItems = [nativeMenuItem(this.doc, ui("saveNewNote", "保存到：新建条目笔记"), "new")];
             const parent = this.paper?.parent;
             const noteIDs = parent?.getNotes?.() || [];
             for (const noteID of noteIDs) {
                 const note = Zotero.Items.get(noteID) || await Zotero.Items.getAsync(noteID);
                 if (!note?.isNote?.()) continue;
                 const title = note.getNoteTitle?.() || ui("noteName", `笔记 ${note.id}`, { id: note.id });
-                const targetOption = html(this.doc, "option", "", ui("saveTo", `保存到：${title}`, { title }));
-                targetOption.value = String(note.id);
-                this.noteTargetPicker.append(targetOption);
+                targetItems.push(nativeMenuItem(this.doc, ui("saveTo", `保存到：${title}`, { title }), String(note.id)));
                 if (!this.noteContexts.some(entry => entry.id === note.id)) {
-                    const option = html(this.doc, "option", "", title);
-                    option.value = String(note.id);
-                    this.notePicker.append(option);
+                    noteItems.push(nativeMenuItem(this.doc, title, String(note.id)));
                 }
             }
+            replaceMenuItems(this.notePicker, noteItems);
+            replaceMenuItems(this.noteTargetPicker, targetItems);
             this.notePicker.value = "";
-            this.notePicker.disabled = this.notePicker.options.length <= 1;
-            if (this.notePicker.disabled) placeholder.textContent = parent ? ui("noNotesAvailable", "当前条目没有可添加的笔记") : ui("standaloneNoNotes", "独立 PDF 没有关联条目笔记");
-            this.noteTargetPicker.value = [...this.noteTargetPicker.options].some(option => option.value === selectedTarget) ? selectedTarget : "new";
+            this.notePicker.disabled = noteItems.length <= 1;
+            if (this.notePicker.disabled) placeholder.setAttribute("label", parent ? ui("noNotesAvailable", "当前条目没有可添加的笔记") : ui("standaloneNoNotes", "独立 PDF 没有关联条目笔记"));
+            this.noteTargetPicker.value = targetItems.some(option => option.value === selectedTarget) ? selectedTarget : "new";
             this.noteSaveMode.disabled = this.noteTargetPicker.value === "new";
         }
 
@@ -2096,6 +2124,9 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
                 icon: rootURI + "content/codex.svg",
                 l10nID: "zcc-section-sidenav",
                 orderable: false,
+            },
+            onInit({ body }) {
+                placeSectionVisuallyLast(body);
             },
             onItemChange({ item, setEnabled }) {
                 const supported = Boolean(item?.isRegularItem?.() || item?.isAttachment?.());
