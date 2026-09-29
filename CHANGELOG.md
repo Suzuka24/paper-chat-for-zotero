@@ -11,6 +11,7 @@ All notable changes to this project are documented here.
 ### Fixed
 
 - Prevented first-click sidebar navigation from landing in blank padding by removing Paper Chat's global item-pane order patch and leaving pane positioning to Zotero.
+- Removed the outer card around Paper Chat and kept control rows on one line in narrow sidebars for a lighter, native item-pane layout.
 
 ## [0.6.6] - 2026-09-19
 

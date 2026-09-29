@@ -47,6 +47,10 @@ def main() -> int:
         raise RuntimeError("The Paper Chat sidenav button must remain fixed after orderable panes.")
     if "applyItemPaneOrder" in main_script or "movePaperChatSectionLast" in main_script:
         raise RuntimeError("Paper Chat must not patch Zotero's global item-pane ordering.")
+    if not re.search(r"\.zcc-panel\{[^}]*border:0;[^}]*border-radius:0", main_script):
+        raise RuntimeError("Paper Chat must use the native frameless item-pane layout.")
+    if not re.search(r"\.zcc-actions\{[^}]*flex-wrap:nowrap", main_script):
+        raise RuntimeError("Paper Chat action controls must remain on one row in narrow panes.")
     if not re.search(r'registerObserver\(PREF_PREFIX \+ "fontSize",[^;]+, true\)', main_script):
         raise RuntimeError("The Paper Chat font-size preference must be observed by open panels.")
     if 'webSearchMode: pref("webSearchMode", "live")' not in main_script:
