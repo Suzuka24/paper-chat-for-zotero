@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here.
 
+## [0.6.8] - 2026-10-20
+
+### Fixed
+
+- Kept sidebar icons and content sections in the same live order when plugins are installed, updated, enabled, disabled, or loaded in a different sequence, without moving Zotero's pane DOM nodes.
+
 ## [0.6.7] - 2026-09-29
 
 ### Changed

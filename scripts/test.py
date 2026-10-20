@@ -57,8 +57,12 @@ def main() -> int:
         raise RuntimeError("The note refresh control must remain a text-only button.")
     if "details.initPaneOrder" in main_script or "details.changePaneOrder" in main_script:
         raise RuntimeError("Paper Chat must not move Zotero item-pane DOM nodes after initialization.")
-    if not re.search(r'section\.style\.order\s*=\s*"2147483647"', main_script):
-        raise RuntimeError("Paper Chat must remain visually last without changing Zotero's pane DOM order.")
+    if 'pane.style.setProperty("order", String(order))' not in main_script:
+        raise RuntimeError("Paper Chat content order must follow the current Zotero sidenav icon order.")
+    if "MutationObserver(sync)" not in main_script or "observer.observe(sidenav, { childList: true, subtree: true })" not in main_script:
+        raise RuntimeError("Paper Chat must resync pane order when plugins change the sidenav.")
+    if "2147483647" in main_script or "placeSectionVisuallyLast" in main_script:
+        raise RuntimeError("Paper Chat must not force itself to an order independent of the sidenav.")
     if not re.search(r'registerObserver\(PREF_PREFIX \+ "fontSize",[^;]+, true\)', main_script):
         raise RuntimeError("The Paper Chat font-size preference must be observed by open panels.")
     if 'webSearchMode: pref("webSearchMode", "live")' not in main_script:

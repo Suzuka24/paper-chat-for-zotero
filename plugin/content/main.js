@@ -12,6 +12,7 @@ var ZoteroCodexChatPlugin = (() => {
     const panels = new Map();
     const pendingSelections = new Map();
     const itemPaneCompatibilityPatches = new Map();
+    const paneOrderObservers = new Map();
     let registeredPaneID = null;
     let registeredPreferencePaneID = null;
     let pluginRootURI = "";
@@ -447,9 +448,46 @@ var ZoteroCodexChatPlugin = (() => {
         button.setAttribute("aria-label", label);
     }
 
-    function placeSectionVisuallyLast(sectionBody) {
-        const section = sectionBody?.closest("item-pane-custom-section");
-        if (section) section.style.order = "2147483647";
+    function syncPaneVisualOrder(details) {
+        const sidenav = details?.sidenav || details?.querySelector("item-pane-sidenav");
+        if (!sidenav) return;
+        const paneOrder = new Map(
+            [...sidenav.querySelectorAll(".btn[data-pane]")]
+                .map((button, index) => [button.dataset.pane, index]),
+        );
+        const panes = details.getPanes?.() || [...details.querySelectorAll(":scope > [data-pane]")];
+        for (const [fallbackIndex, pane] of panes.entries()) {
+            const order = paneOrder.get(pane.dataset.pane) ?? paneOrder.size + fallbackIndex;
+            pane.style.setProperty("order", String(order));
+        }
+    }
+
+    function observePaneVisualOrder(sectionBody) {
+        const details = sectionBody?.closest("item-pane-custom-section")?.closest("item-details");
+        const sidenav = details?.sidenav || details?.querySelector("item-pane-sidenav");
+        if (!details || !sidenav || paneOrderObservers.has(details)) return;
+        const win = details.ownerDocument.defaultView;
+        let frame = 0;
+        const sync = () => {
+            if (frame) win.cancelAnimationFrame(frame);
+            frame = win.requestAnimationFrame(() => {
+                frame = 0;
+                syncPaneVisualOrder(details);
+            });
+        };
+        const observer = new win.MutationObserver(sync);
+        observer.observe(sidenav, { childList: true, subtree: true });
+        paneOrderObservers.set(details, { observer, get frame() { return frame; } });
+        sync();
+    }
+
+    function stopPaneVisualOrderObserver(details) {
+        const state = paneOrderObservers.get(details);
+        if (!state) return;
+        state.observer.disconnect();
+        if (state.frame) details.ownerDocument.defaultView.cancelAnimationFrame(state.frame);
+        for (const pane of details.getPanes?.() || []) pane.style.removeProperty("order");
+        paneOrderObservers.delete(details);
     }
 
     function bridgeHeaders() {
@@ -2126,7 +2164,7 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
                 orderable: false,
             },
             onInit({ body }) {
-                placeSectionVisuallyLast(body);
+                observePaneVisualOrder(body);
             },
             onItemChange({ item, setEnabled }) {
                 const supported = Boolean(item?.isRegularItem?.() || item?.isAttachment?.());
@@ -2156,6 +2194,7 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
                 }
             },
             onDestroy({ body }) {
+                stopPaneVisualOrderObserver(body.closest("item-pane-custom-section")?.closest("item-details"));
                 panels.get(body)?.destroy();
                 panels.delete(body);
             },
@@ -2168,6 +2207,9 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
     }
 
     async function onMainWindowUnload(win) {
+        for (const details of [...paneOrderObservers.keys()]) {
+            if (details.ownerDocument.defaultView === win) stopPaneVisualOrderObserver(details);
+        }
         for (const [body, panel] of panels) {
             if (body.ownerDocument.defaultView === win) {
                 panel.destroy();
@@ -2177,6 +2219,7 @@ item-pane-sidenav .btn[data-pane="${PANE_ID}"]{overflow:hidden;color:transparent
     }
 
     async function shutdown() {
+        for (const details of [...paneOrderObservers.keys()]) stopPaneVisualOrderObserver(details);
         for (const panel of panels.values()) panel.destroy();
         panels.clear();
         if (registeredPaneID) {

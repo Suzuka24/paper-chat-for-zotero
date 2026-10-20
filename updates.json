@@ -3,9 +3,9 @@
     "paper-chat-for-zotero@suzuka24.github.io": {
       "updates": [
         {
-          "version": "0.6.7",
-          "update_link": "https://github.com/Suzuka24/paper-chat-for-zotero/releases/download/v0.6.7/paper-chat-for-zotero.xpi",
-          "update_hash": "sha256:af47094fcd4b59f6f240de79d1e33674fbe2c142ef115c6767d0eb2f0a7597a6",
+          "version": "0.6.8",
+          "update_link": "https://github.com/Suzuka24/paper-chat-for-zotero/releases/download/v0.6.8/paper-chat-for-zotero.xpi",
+          "update_hash": "sha256:c179d6ee91ad03a5ba5d9d4e7fb46e106cb00dc9eff0f420bf0b858ccd3314ae",
           "applications": {
             "zotero": {
               "strict_min_version": "9.0.0",
